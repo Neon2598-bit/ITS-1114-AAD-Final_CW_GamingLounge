@@ -1,7 +1,7 @@
 package edu.ijse.gamingLounge.entity;
 
 import jakarta.persistence.*;
-import lk.ijse.gaming_lounge_system.status.BookingStatus;
+import edu.ijse.gamingLounge.status.BookingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,5 @@
 package edu.ijse.gamingLounge.entity;
 
-import edu.ijse.gamingLounge.status.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,19 +11,17 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class FoodOrder {
+public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime orderDate;
+    @Column(unique = true)
+    private String invoiceNumber;
 
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    private LocalDateTime issueDate;
 
-    private Double totalAmount;
-
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @OneToOne
+    @JoinColumn(name = "payment_id", unique = true)
+    private Payment payment;
 }

@@ -1,30 +1,24 @@
 package edu.ijse.gamingLounge.entity;
 
-import edu.ijse.gamingLounge.status.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class FoodOrder {
+public class Snack {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime orderDate;
-
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
-
-    private Double totalAmount;
+    private String name;
+    private Double price;
+    private Integer quantity;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @JoinColumn(name = "snack_category_id")
+    private SnackCategory snackCategory;
 }
