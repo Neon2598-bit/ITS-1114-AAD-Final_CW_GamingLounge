@@ -19,6 +19,6 @@ public class MembershipPlan {
 
     private String planName;
     private Double price;
-    private String durationDays;
+    private Integer durationDays;
     private Double discountPercentage;
 }
