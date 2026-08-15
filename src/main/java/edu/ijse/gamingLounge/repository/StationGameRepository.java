@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StationGameRepository extends JpaRepository<StationGame, Long> {
+    // Prevents adding the SAME game to the SAME station twice
+    boolean existsByStation_IdAndGame_Id(Long stationId, Long gameId);
 }
