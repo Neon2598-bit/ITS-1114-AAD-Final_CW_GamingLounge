@@ -66,7 +66,14 @@ public class StationServiceImpl implements StationService {
 
     @Override
     public void deleteStation(Long id) {
-
+        try {
+            if (stationRepository.existsById(id)) {
+                stationRepository.deleteById(id);
+                log.info("Specific station has been deleted successfully");
+            }
+        } catch (Exception e) {
+            log.error("Operation failed: Couldn't delete", e.getMessage());
+        }
     }
 
     @Override
