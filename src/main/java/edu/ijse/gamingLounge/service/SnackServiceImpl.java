@@ -100,7 +100,16 @@ public class SnackServiceImpl implements SnackService {
 
     @Override
     public List<SnackDTO> getLowStockSnacks(Integer threshold) {
-        return List.of();
+        List<SnackDTO> list = new ArrayList<>();
+        try {
+            for (Snack s : snackRepository.findLowStockNative(threshold)) {
+                list.add(toDTO(s));
+            }
+            log.info("All snacks that low stock retrieved successfully");
+        } catch (Exception e) {
+            log.error("Couldn't find low stock snacks", e.getMessage());
+        }
+        return list;
     }
 
     private SnackDTO toDTO(Snack s) {

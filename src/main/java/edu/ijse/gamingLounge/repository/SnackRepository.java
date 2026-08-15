@@ -11,4 +11,7 @@ import java.util.List;
 public interface SnackRepository extends JpaRepository<Snack, Long> {
     @Query("SELECT s FROM Snack s JOIN FETCH s.snackCategory")
     List<Snack> findAllWithCategory();
+
+    @Query(value = "SELECT * FROM snack WHERE stock_qty <= :threshold", nativeQuery = true)
+    List<Snack> findLowStockNative(Integer threshold);
 }
