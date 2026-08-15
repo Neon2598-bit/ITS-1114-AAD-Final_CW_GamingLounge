@@ -86,6 +86,15 @@ public class SnackServiceImpl implements SnackService {
 
     @Override
     public SnackDTO getSnackById(Long id) {
+        try {
+            Optional<Snack> optional = snackRepository.findById(id);
+            if (optional.isPresent()) {
+                log.info("Specific snack retrieved successfully");
+                return toDTO(optional.get());
+            }
+        } catch (Exception e) {
+            log.error("Couldn't find this snack", e.getMessage());
+        }
         return null;
     }
 
