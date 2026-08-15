@@ -47,7 +47,14 @@ public class StationGameServiceImpl implements StationGameService {
 
     @Override
     public void deleteStationGame(Long id) {
-
+        try {
+            if (stationGameRepository.existsById(id)) {
+                stationGameRepository.deleteById(id);
+                log.info("Specific station game deleted successfully");
+            }
+        } catch (Exception e) {
+            log.error("Couldn't delete specific station game", e.getMessage());
+        }
     }
 
     @Override
