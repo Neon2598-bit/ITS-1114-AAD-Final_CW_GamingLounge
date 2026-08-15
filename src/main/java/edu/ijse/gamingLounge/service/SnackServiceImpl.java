@@ -40,7 +40,21 @@ public class SnackServiceImpl implements SnackService {
 
     @Override
     public void updateSnack(SnackDTO dto) {
-
+        try {
+            Optional<Snack> snackOptional = snackRepository.findById(dto.getId());
+            Optional<SnackCategory> categoryOptional = snackCategoryRepository.findById(dto.getSnackCategoryId());
+            if (snackOptional.isPresent() && categoryOptional.isPresent()) {
+                Snack snack = snackOptional.get();
+                snack.setName(dto.getName());
+                snack.setPrice(dto.getPrice());
+                snack.setStockQty(dto.getStockQty());
+                snack.setSnackCategory(categoryOptional.get());
+                snackRepository.save(snack);
+                log.info("Snack updated successfully to database");
+            }
+        } catch (Exception e) {
+            log.error("Snack updation failed", e.getMessage());
+        }
     }
 
     @Override
