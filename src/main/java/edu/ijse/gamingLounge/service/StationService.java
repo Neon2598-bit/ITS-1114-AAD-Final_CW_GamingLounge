@@ -1,5 +1,7 @@
 package edu.ijse.gamingLounge.service;
 
+import edu.ijse.gamingLounge.dto.StationDTO;
+
 import java.util.List;
 
 public interface StationService {
