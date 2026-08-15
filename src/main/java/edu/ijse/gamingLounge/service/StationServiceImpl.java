@@ -93,6 +93,15 @@ public class StationServiceImpl implements StationService {
 
     @Override
     public StationDTO getStationById(Long id) {
+        try {
+            Optional<Station> optional = stationRepository.findById(id);
+            if (optional.isPresent()) {
+                log.info("Station retrieved successfully");
+                return toDTO(optional.get());
+            }
+        } catch (Exception e) {
+            log.error("Can't find specific station", e.getMessage());
+        }
         return null;
     }
 
