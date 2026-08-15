@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/station")
 @RequiredArgsConstructor
@@ -36,5 +38,12 @@ public class StationController {
         stationService.deleteStation(id);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
+    }
+
+    @GetMapping
+    public ResponseEntity<CommonResponse> getAll() {
+        List<StationDTO> list = stationService.getAllStations();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }
 }
