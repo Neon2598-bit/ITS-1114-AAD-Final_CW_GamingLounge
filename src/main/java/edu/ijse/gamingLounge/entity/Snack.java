@@ -16,7 +16,7 @@ public class Snack {
 
     private String name;
     private Double price;
-    private Integer quantity;
+    private Integer stockQty;
 
     @ManyToOne
     @JoinColumn(name = "snack_category_id")
