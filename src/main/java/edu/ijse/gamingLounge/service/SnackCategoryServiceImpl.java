@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,17 @@ public class SnackCategoryServiceImpl implements SnackCategoryService {
 
     @Override
     public void updateCategory(SnackCategoryDTO dto) {
-        
+        try {
+            Optional<SnackCategory> optional = snackCategoryRepository.findById(dto.getId());
+            if (optional.isPresent()) {
+                SnackCategory category = optional.get();
+                category.setCategoryName(dto.getCategoryName());
+                snackCategoryRepository.save(category);
+                log.info("Snack category updated successfully to database");
+            }
+        } catch (Exception e) {
+            log.error("Snack Category updation failed", e.getMessage());
+        }
     }
 
     @Override
