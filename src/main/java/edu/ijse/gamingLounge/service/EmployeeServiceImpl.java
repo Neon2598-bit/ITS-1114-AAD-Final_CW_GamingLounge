@@ -5,7 +5,6 @@ import edu.ijse.gamingLounge.entity.Employee;
 import edu.ijse.gamingLounge.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import java.util.Optional;
 @Slf4j
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void saveEmployee(EmployeeDTO dto) {
@@ -30,7 +28,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setName(dto.getName());
         employee.setEmail(dto.getEmail());
         employee.setPhone(dto.getPhone());
-        employee.setPassword(passwordEncoder.encode(dto.getPassword()));
+        employee.setPassword(dto.getPassword());
         employeeRepository.save(employee);
         log.info("Employee saved successfully to database");
     }

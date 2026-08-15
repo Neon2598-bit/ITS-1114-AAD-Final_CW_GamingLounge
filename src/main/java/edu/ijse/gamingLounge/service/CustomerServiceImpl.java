@@ -5,7 +5,6 @@ import edu.ijse.gamingLounge.entity.Customer;
 import edu.ijse.gamingLounge.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import java.util.Optional;
 @Slf4j
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public Long saveCustomer(CustomerDTO dto) {
@@ -30,7 +28,7 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setName(dto.getName());
             customer.setEmail(dto.getEmail());
             customer.setPhone(dto.getPhone());
-            customer.setPassword(passwordEncoder.encode(dto.getPassword()));
+            customer.setPassword(dto.getPassword());
             customer.setAddress(dto.getAddress());
             Customer saved = customerRepository.save(customer);
             log.info("Customer saved successfully to the database");
