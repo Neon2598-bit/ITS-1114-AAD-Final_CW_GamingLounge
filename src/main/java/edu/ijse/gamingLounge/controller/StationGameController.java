@@ -57,4 +57,16 @@ public class StationGameController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }
+
+    // GET /api/v1/station-game/by-game/1
+    @GetMapping("/by-game/{gameId}")
+    public ResponseEntity<CommonResponse> getByGame (@PathVariable Long gameId) {
+        List<StationGameDTO> list = stationGameService.getStationsByGame(gameId);
+        if (list.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new CommonResponse(ResponseCode.NOT_FOUND, ResponseMessage.NOT_FOUND));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
+    }
 }
