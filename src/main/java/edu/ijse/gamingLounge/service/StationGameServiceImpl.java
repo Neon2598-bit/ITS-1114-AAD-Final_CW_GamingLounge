@@ -88,7 +88,16 @@ public class StationGameServiceImpl implements StationGameService {
 
     @Override
     public List<StationGameDTO> getStationsByGame(Long gameId) {
-        return List.of();
+        List<StationGameDTO> list = new ArrayList<>();
+        try {
+            for (StationGame sg : stationGameRepository.findByGame_Id(gameId)) {
+                list.add(toDTO(sg));
+            }
+            log.info("All stations retrieved according to the specific game");
+        } catch (Exception e) {
+            log.error("Operation failed: {}", e.getMessage());
+        }
+        return list;
     }
 
     private StationGameDTO toDTO(StationGame sg) {

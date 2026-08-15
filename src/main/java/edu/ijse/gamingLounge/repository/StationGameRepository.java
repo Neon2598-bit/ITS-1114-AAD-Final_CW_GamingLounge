@@ -16,4 +16,6 @@ public interface StationGameRepository extends JpaRepository<StationGame, Long> 
     List<StationGame> findAllWithDetails();
 
     List<StationGame> findByStation_Id(Long stationId);
+
+    List<StationGame> findByGame_Id(Long gameId);
 }
