@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,7 +79,16 @@ public class StationServiceImpl implements StationService {
 
     @Override
     public List<StationDTO> getAllStations() {
-        return List.of();
+        List<StationDTO> list = new ArrayList<>();
+        try {
+            for (Station s : stationRepository.findAllWithDetails()) {
+                list.add(toDTO(s));
+            }
+            log.info("All stations retrieved successfully");
+        } catch (Exception e) {
+            log.error("Couldn't fetch all stations", e.getMessage());
+        }
+        return list;
     }
 
     @Override
@@ -89,5 +99,18 @@ public class StationServiceImpl implements StationService {
     @Override
     public List<StationDTO> getAvailableStationsByBranch(Long branchId) {
         return List.of();
+    }
+
+    private StationDTO toDTO(Station s) {
+        return new StationDTO(
+                s.getId(),
+                s.getStationCode(),
+                s.getStatus().name(),
+                s.getBranch().getId(),
+                s.getStationType().getId(),
+                s.getBranch().getBranchName(),
+                s.getStationType().getTypeName(),
+                s.getStationType().getHourlyRate()
+        );
     }
 }
