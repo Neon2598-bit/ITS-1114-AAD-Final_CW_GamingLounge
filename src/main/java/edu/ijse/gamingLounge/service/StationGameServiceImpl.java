@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,7 +60,16 @@ public class StationGameServiceImpl implements StationGameService {
 
     @Override
     public List<StationGameDTO> getAllStationGames() {
-        return List.of();
+        List<StationGameDTO> list = new ArrayList<>();
+        try {
+            for (StationGame sg : stationGameRepository.findAllWithDetails()) {
+                list.add(toDTO(sg));
+            }
+            log.info("All stationGames retrieved successfully");
+        } catch (Exception e) {
+            log.error("Couldn't retrieve station games", e.getMessage());
+        }
+        return list;
     }
 
     @Override
@@ -70,5 +80,15 @@ public class StationGameServiceImpl implements StationGameService {
     @Override
     public List<StationGameDTO> getStationsByGame(Long gameId) {
         return List.of();
+    }
+
+    private StationGameDTO toDTO(StationGame sg) {
+        return new StationGameDTO(
+                sg.getId(),
+                sg.getStation().getId(),
+                sg.getGame().getId(),
+                sg.getStation().getStationCode(),
+                sg.getGame().getGameName()
+        );
     }
 }
