@@ -107,7 +107,17 @@ public class StationServiceImpl implements StationService {
 
     @Override
     public List<StationDTO> getAvailableStationsByBranch(Long branchId) {
-        return List.of();
+        List<StationDTO> list = new ArrayList<>();
+        try {
+            List<Station> stations = stationRepository.findByBranch_IdAndStatus(branchId, StationStatus.AVAILABLE);
+            for (Station s : stations) {
+                list.add(toDTO(s));
+            }
+            log.info("Currently available stations retrieved successfully according to the specific branch");
+        } catch (Exception e) {
+            log.error("No available stations at specific branch", e.getMessage());
+        }
+        return list;
     }
 
     private StationDTO toDTO(Station s) {
