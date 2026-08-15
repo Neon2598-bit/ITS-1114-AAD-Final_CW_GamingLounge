@@ -19,48 +19,68 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     public void saveBranch(BranchDTO branchDTO) {
-        try {
             Branch branch = new Branch();
+            if (branchRepository.existsByBranchName(branchDTO.getBranchName())){
+                log.error("This branch name already exists: {}", branchDTO.getBranchName());
+                throw new edu.ijse.gamingLounge.exception.BusinessException(
+                        "This branch name already exists"
+                );
+            }
             branch.setBranchName(branchDTO.getBranchName());
             branch.setAddress(branchDTO.getAddress());
+
+            if (branchRepository.existsByContactNumber(branchDTO.getContactNumber())){
+                log.error("This number already exists: {}", branchDTO.getContactNumber());
+                throw new edu.ijse.gamingLounge.exception.BusinessException("This number already exists");
+            }
+
             branch.setContactNumber(branchDTO.getContactNumber());
             branchRepository.save(branch);
             log.info("Branch saved successfully to database");
-        } catch (Exception e) {
-            log.error("Couldn't save branch to the database", e.getMessage());
-        }
     }
 
     @Override
     public void updateBranch(BranchDTO branchDTO) {
-        try {
             Optional<Branch> branchOptional = branchRepository.findById(branchDTO.getId());
             if (branchOptional.isPresent()) {
                 Branch branch = branchOptional.get();
+
+                if (branchRepository.existsByBranchName(branchDTO.getBranchName())){
+                    log.error("This branch name already exists: {}", branchDTO.getBranchName());
+                    throw new edu.ijse.gamingLounge.exception.BusinessException(
+                            "This branch name already exists"
+                    );
+                }
+
                 branch.setBranchName(branchDTO.getBranchName());
                 branch.setAddress(branchDTO.getAddress());
+
+                if (branchRepository.existsByContactNumber(branchDTO.getContactNumber())){
+                    log.error("This number already exists: {}", branchDTO.getContactNumber());
+                    throw new edu.ijse.gamingLounge.exception.BusinessException("This number already exists");
+                }
+
                 branch.setContactNumber(branchDTO.getContactNumber());
                 branchRepository.save(branch);
                 log.info("Successfully update branch");
+
+            } else {
+                log.error("Couldn't find any branch with this id {}", branchDTO.getId());
+                throw new edu.ijse.gamingLounge.exception.BusinessException("Couldn't find any branch with this id");
             }
-        } catch (Exception e) {
-            log.error("Couldn't update the branch", e.getMessage());
-        }
     }
 
     @Override
     public void deleteBranch(Long branchId) {
-        try {
             Optional<Branch> branchOptional = branchRepository.findById(branchId);
             if (branchOptional.isPresent()) {
                 branchRepository.deleteById(branchId);
                 log.info("Branch deleted successfully from database");
             } else {
                 log.error("Couldn't find any branch with id {}", branchId);
+                throw new edu.ijse.gamingLounge.exception
+                        .BusinessException("Couldn't find any branch with id " + branchId);
             }
-        } catch (Exception e) {
-            log.error("Operation failed: {}", e.getMessage());
-        }
     }
 
     @Override
