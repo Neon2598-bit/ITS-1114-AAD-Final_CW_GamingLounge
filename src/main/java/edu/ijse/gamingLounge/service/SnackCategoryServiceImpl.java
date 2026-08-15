@@ -6,6 +6,8 @@ import edu.ijse.gamingLounge.repository.SnackCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,12 +46,28 @@ public class SnackCategoryServiceImpl implements SnackCategoryService {
 
     @Override
     public void deleteCategory(Long id) {
-
+        try {
+            if (snackCategoryRepository.existsById(id)) {
+                snackCategoryRepository.deleteById(id);
+                log.info("Specific category has been deleted");
+            }
+        } catch (Exception e) {
+            log.error("Category deletion failed", e.getMessage());
+        }
     }
 
     @Override
     public List<SnackCategoryDTO> getAllCategories() {
-        return List.of();
+        List<SnackCategoryDTO> list = new ArrayList<>();
+        try {
+            for (SnackCategory c : snackCategoryRepository.findAll()) {
+                list.add(new SnackCategoryDTO(c.getId(), c.getCategoryName()));
+            }
+            log.info("All categories retrieved successfully");
+        } catch (Exception e) {
+            log.error("Couldn't retriene categories", e.getMessage());
+        }
+        return list;
     }
 
     @Override
