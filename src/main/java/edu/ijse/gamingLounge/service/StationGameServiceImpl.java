@@ -28,19 +28,24 @@ public class StationGameServiceImpl implements StationGameService {
         try {
             if (stationGameRepository.existsByStation_IdAndGame_Id(dto.getStationId(), dto.getGameId())) {
                 log.error("This game is already linked to this station");
-                return;
+                throw new edu.ijse.gamingLounge.exception.BusinessException(
+                        "This game is already linked to this station.");
             }
 
             Optional<Station> stationOptional = stationRepository.findById(dto.getStationId());
             Optional<Game> gameOptional = gameRepository.findById(dto.getGameId());
 
-            if (stationOptional.isPresent() && gameOptional.isPresent()) {
-                StationGame stationGame = new StationGame();
-                stationGame.setStation(stationOptional.get());
-                stationGame.setGame(gameOptional.get());
-                stationGameRepository.save(stationGame);
-                log.info("This station game saved successfully to database");
+            if (stationOptional.isEmpty() || gameOptional.isEmpty()) {
+                log.error("Station or Game not found");
+                throw new edu.ijse.gamingLounge.exception.BusinessException("Station or game not found.");
             }
+
+            StationGame stationGame = new StationGame();
+            stationGame.setStation(stationOptional.get());
+            stationGame.setGame(gameOptional.get());
+            stationGameRepository.save(stationGame);
+            log.info("This station game saved successfully to database");
+
         } catch (Exception e) {
             log.error("Saving has been failed", e.getMessage());
         }
@@ -48,14 +53,13 @@ public class StationGameServiceImpl implements StationGameService {
 
     @Override
     public void deleteStationGame(Long id) {
-        try {
-            if (stationGameRepository.existsById(id)) {
-                stationGameRepository.deleteById(id);
-                log.info("Specific station game deleted successfully");
-            }
-        } catch (Exception e) {
-            log.error("Couldn't delete specific station game", e.getMessage());
+        if (!stationGameRepository.existsById(id)) {
+            log.error("Station-game link not found: {}", id);
+            throw new edu.ijse.gamingLounge.exception.BusinessException(
+                    "Station-game link not found.", org.springframework.http.HttpStatus.NOT_FOUND);
         }
+        stationGameRepository.deleteById(id);
+        log.info("Specific station game deleted successfully");
     }
 
     @Override

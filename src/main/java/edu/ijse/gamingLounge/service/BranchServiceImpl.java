@@ -55,6 +55,8 @@ public class BranchServiceImpl implements BranchService {
             if (branchOptional.isPresent()) {
                 branchRepository.deleteById(branchId);
                 log.info("Branch deleted successfully from database");
+            } else {
+                log.error("Couldn't find any branch with id {}", branchId);
             }
         } catch (Exception e) {
             log.error("Operation failed: {}", e.getMessage());
