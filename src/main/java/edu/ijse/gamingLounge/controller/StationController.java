@@ -30,4 +30,11 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CommonResponse> delete(@PathVariable Long id) {
+        stationService.deleteStation(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
+    }
 }
