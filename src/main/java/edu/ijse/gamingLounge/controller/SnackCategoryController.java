@@ -24,4 +24,11 @@ public class SnackCategoryController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new CommonResponse(ResponseCode.CREATED, ResponseMessage.SUCCESS));
     }
+
+    @PutMapping
+    public ResponseEntity<CommonResponse> update(@Valid @RequestBody SnackCategoryDTO dto) {
+        snackCategoryService.updateCategory(dto);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
+    }
 }
