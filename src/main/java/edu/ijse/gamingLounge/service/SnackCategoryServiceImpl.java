@@ -72,6 +72,16 @@ public class SnackCategoryServiceImpl implements SnackCategoryService {
 
     @Override
     public SnackCategoryDTO getCategoryById(Long id) {
+        try {
+            Optional<SnackCategory> optional = snackCategoryRepository.findById(id);
+            if (optional.isPresent()) {
+                SnackCategory c = optional.get();
+                log.info("Snack category retrieved successfully");
+                return new SnackCategoryDTO(c.getId(), c.getCategoryName());
+            }
+        } catch (Exception e) {
+            log.error("Couldn't fetch the specific category", e.getMessage());
+        }
         return null;
     }
 }
