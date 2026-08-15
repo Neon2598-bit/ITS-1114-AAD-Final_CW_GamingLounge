@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,7 +72,16 @@ public class SnackServiceImpl implements SnackService {
 
     @Override
     public List<SnackDTO> getAllSnacks() {
-        return List.of();
+        List<SnackDTO> list = new ArrayList<>();
+        try {
+            for (Snack s : snackRepository.findAllWithCategory()) {
+                list.add(toDTO(s));
+            }
+            log.info("All snacks retrieved successfully");
+        } catch (Exception e) {
+            log.error("Couldn't retrieve snack list", e.getMessage());
+        }
+        return list;
     }
 
     @Override
@@ -82,5 +92,16 @@ public class SnackServiceImpl implements SnackService {
     @Override
     public List<SnackDTO> getLowStockSnacks(Integer threshold) {
         return List.of();
+    }
+
+    private SnackDTO toDTO(Snack s) {
+        return new SnackDTO(
+                s.getId(),
+                s.getName(),
+                s.getPrice(),
+                s.getStockQty(),
+                s.getSnackCategory().getId(),
+                s.getSnackCategory().getCategoryName()
+        );
     }
 }
