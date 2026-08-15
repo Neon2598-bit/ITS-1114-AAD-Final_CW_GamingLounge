@@ -14,4 +14,6 @@ public interface StationGameRepository extends JpaRepository<StationGame, Long> 
 
     @Query("SELECT sg FROM StationGame sg JOIN FETCH sg.station JOIN FETCH sg.game")
     List<StationGame> findAllWithDetails();
+
+    List<StationGame> findByStation_Id(Long stationId);
 }
