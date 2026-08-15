@@ -31,4 +31,11 @@ public class SnackCategoryController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CommonResponse> delete(@PathVariable Long id) {
+        snackCategoryService.deleteCategory(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
+    }
 }
