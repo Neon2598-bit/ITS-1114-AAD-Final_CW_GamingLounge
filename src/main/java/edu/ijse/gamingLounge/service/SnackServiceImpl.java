@@ -59,7 +59,14 @@ public class SnackServiceImpl implements SnackService {
 
     @Override
     public void deleteSnack(Long id) {
-
+        try {
+            if (snackRepository.existsById(id)) {
+                snackRepository.deleteById(id);
+                log.info("Specific snack has been deleted");
+            }
+        } catch (Exception e) {
+            log.error("Snack deletion failed", e.getMessage());
+        }
     }
 
     @Override
