@@ -23,7 +23,7 @@ public class StationDTO {
 
     @NotNull(message = "Station type is required")
     private Long stationTypeId;
-    
+
     private String branchName;
     private String typeName;
     private Double hourlyRate;

@@ -26,5 +26,5 @@ public class Station {
 
     @ManyToOne
     @JoinColumn(name = "station_type_id")
-    private StationType staitonType;
+    private StationType stationType;
 }
