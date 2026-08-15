@@ -58,4 +58,12 @@ public class SnackController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, dto, ResponseMessage.SUCCESS));
     }
+
+    // GET /api/v1/snack/low-stock?threshold=5
+    @GetMapping("/low-stock")
+    public ResponseEntity<CommonResponse> getLowStock(@RequestParam Integer threshold) {
+        List<SnackDTO> list = snackService.getLowStockSnacks(threshold);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
+    }
 }
