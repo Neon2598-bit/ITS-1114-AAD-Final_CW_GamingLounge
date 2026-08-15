@@ -65,7 +65,7 @@ public class SnackCategoryServiceImpl implements SnackCategoryService {
             }
             log.info("All categories retrieved successfully");
         } catch (Exception e) {
-            log.error("Couldn't retriene categories", e.getMessage());
+            log.error("Couldn't retrieve categories", e.getMessage());
         }
         return list;
     }

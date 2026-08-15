@@ -51,4 +51,15 @@ public class SnackCategoryController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CommonResponse> getById(@PathVariable Long id) {
+        SnackCategoryDTO dto = snackCategoryService.getCategoryById(id);
+        if (dto == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new CommonResponse(ResponseCode.NOT_FOUND, ResponseMessage.NOT_FOUND));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, dto, ResponseMessage.SUCCESS));
+    }
 }
