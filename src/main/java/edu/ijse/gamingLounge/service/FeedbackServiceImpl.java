@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,7 +65,17 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public List<FeedbackDTO> getAllFeedback() {
-        return List.of();
+        List<FeedbackDTO> feedbackDTOList = new ArrayList<>();
+
+        try {
+            for (Feedback feedback : feedbackRepository.findAllWithDetails()) {
+                feedbackDTOList.add(toDTO(feedback));
+            }
+            log.info("All feedbacks retrieved successfully");
+        } catch (Exception e) {
+            log.error("Error while fetching feedback");
+        }
+        return feedbackDTOList;
     }
 
     @Override
@@ -75,5 +86,17 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public Double getAverageRating() {
         return 0.0;
+    }
+
+    private FeedbackDTO toDTO(Feedback feedback) {
+        return new FeedbackDTO(
+                feedback.getId(),
+                feedback.getRating(),
+                feedback.getComment(),
+                feedback.getCustomer().getId(),
+                feedback.getBooking().getId(),
+                feedback.getFeedbackDate(),
+                feedback.getCustomer().getName()
+        )
     }
 }
