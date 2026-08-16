@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +32,18 @@ public class StationTypeServiceImpl implements StationTypeService{
 
     @Override
     public void updateStationType(StationTypeDTO stationTypeDTO) {
-
+        try {
+            Optional<StationType> optional = stationTypeRepository.findById(stationTypeDTO.getId());
+            if (optional.isPresent()) {
+                StationType stationType = optional.get();
+                stationType.setTypeName(stationTypeDTO.getTypeName());
+                stationType.setHourlyRate(stationTypeDTO.getHourlyRate());
+                stationTypeRepository.save(stationType);
+                log.info("Station type has be updated successfully");
+            }
+        } catch (Exception e) {
+            log.error("Updation of station type has been failed", e.getMessage());
+        }
     }
 
     @Override
