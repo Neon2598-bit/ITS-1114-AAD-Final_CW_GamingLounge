@@ -53,4 +53,15 @@ public class StationTypeController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CommonResponse> getById (@PathVariable Long id) {
+        StationTypeDTO dto = stationTypeService.getStationTypeById(id);
+        if (dto == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new CommonResponse(ResponseCode.NOT_FOUND, dto, ResponseMessage.NOT_FOUND));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, dto, ResponseMessage.SUCCESS));
+    }
 }
