@@ -64,4 +64,18 @@ public class StationTypeController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, dto, ResponseMessage.SUCCESS));
     }
+
+    // /station-type/affordable?maxRate=300
+    @GetMapping("/affordable")
+    public ResponseEntity<CommonResponse> getAffordable (@RequestParam Double maxRate) {
+        List<StationTypeDTO> stationTypeDTOList = stationTypeService.getAffordableTypes(maxRate);
+
+        if (stationTypeDTOList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new CommonResponse(ResponseCode.NOT_FOUND, stationTypeDTOList, ResponseMessage.NOT_FOUND));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, stationTypeDTOList, ResponseMessage.SUCCESS));
+    }
 }
