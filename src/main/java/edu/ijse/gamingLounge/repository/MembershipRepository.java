@@ -14,4 +14,6 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
 
     @Query("SELECT m FROM Membership m JOIN FETCH m.customer JOIN FETCH m.membershipPlan")
     List<Membership> findAllWithDetails();
+
+    List<Membership> findByCustomer_Id(Long customerId);
 }

@@ -87,6 +87,7 @@ public class MembershipServiceImpl implements MembershipService {
             for (Membership membership : membershipRepository.findAllWithDetails()) {
                 membershipDTOList.add(toDTO(membership));
             }
+            log.info("All Memberships Loaded Successfully");
         } catch (Exception e) {
             log.error("Membership Load Failed");
         }
@@ -95,12 +96,30 @@ public class MembershipServiceImpl implements MembershipService {
 
     @Override
     public MembershipDTO getMembershipById(Long id) {
+        try {
+            Optional<Membership> optional = membershipRepository.findById(id);
+            if (optional.isPresent()) {
+                log.info("Membership Loaded Successfully");
+                return toDTO(optional.get());
+            }
+        } catch (Exception e) {
+            log.error("No membership found for that ID: {}", e.getMessage());
+        }
         return null;
     }
 
     @Override
     public List<MembershipDTO> getMembershipsByCustomer(Long customerId) {
-        return List.of();
+        List<MembershipDTO> list = new ArrayList<>();
+        try {
+            for (Membership m : membershipRepository.findByCustomer_Id(customerId)) {
+                list.add(toDTO(m));
+            }
+            log.info("Membership Loaded Successfully For The Specific Customer");
+        } catch (Exception e) {
+            log.error("Couldn't find membership for that customer: {}", e.getMessage());
+        }
+        return list;
     }
 
     private MembershipDTO toDTO(Membership membership) {
