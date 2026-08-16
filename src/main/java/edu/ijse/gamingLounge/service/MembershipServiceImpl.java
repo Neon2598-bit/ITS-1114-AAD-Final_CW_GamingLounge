@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,7 +81,16 @@ public class MembershipServiceImpl implements MembershipService {
 
     @Override
     public List<MembershipDTO> getAllMemberships() {
-        return List.of();
+        List<MembershipDTO> membershipDTOList = new ArrayList<>();
+
+        try {
+            for (Membership membership : membershipRepository.findAllWithDetails()) {
+                membershipDTOList.add(toDTO(membership));
+            }
+        } catch (Exception e) {
+            log.error("Membership Load Failed");
+        }
+        return membershipDTOList;
     }
 
     @Override
@@ -91,5 +101,18 @@ public class MembershipServiceImpl implements MembershipService {
     @Override
     public List<MembershipDTO> getMembershipsByCustomer(Long customerId) {
         return List.of();
+    }
+
+    private MembershipDTO toDTO(Membership membership) {
+        return new MembershipDTO(
+                membership.getId(),
+                membership.getCustomer().getId(),
+                membership.getMembershipPlan().getId(),
+                membership.getStartDate(),
+                membership.getEndDate(),
+                membership.getStatus().name(),
+                membership.getCustomer().getName(),
+                membership.getMembershipPlan().getPlanName()
+        );
     }
 }
