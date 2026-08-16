@@ -112,6 +112,6 @@ public class FeedbackServiceImpl implements FeedbackService {
                 feedback.getBooking().getId(),
                 feedback.getFeedbackDate(),
                 feedback.getCustomer().getName()
-        )
+        );
     }
 }
