@@ -80,7 +80,17 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public List<FeedbackDTO> getFeedbackByBooking(Long bookingId) {
-        return List.of();
+        List<FeedbackDTO> feedbackDTOList = new ArrayList<>();
+
+        try {
+            for (Feedback feedback : feedbackRepository.findByBooking_Id(bookingId)) {
+                feedbackDTOList.add(toDTO(feedback));
+            }
+            log.info("Specific feedbacks retrieved for the booking {} successfully", bookingId);
+        } catch (Exception e) {
+            log.error("Error while fetching feedback for that booking {}", bookingId, e);
+        }
+        return feedbackDTOList;
     }
 
     @Override
