@@ -92,6 +92,17 @@ public class StationTypeServiceImpl implements StationTypeService{
 
     @Override
     public List<StationTypeDTO> getAffordableTypes(Double maxRate) {
-        return List.of();
+        List<StationTypeDTO> list = new ArrayList<>();
+
+        try {
+            List<StationType> stationTypes = stationTypeRepository.findAffordableTypesNative(maxRate);
+            for (StationType s : stationTypes) {
+                list.add(new StationTypeDTO(s.getId(), s.getTypeName(), s.getHourlyRate()));
+            }
+            log.info("All station types that can be afford retrieved successfully");
+        } catch (Exception e) {
+            log.error("No affordable station type found", e.getMessage());
+        }
+        return list;
     }
 }
