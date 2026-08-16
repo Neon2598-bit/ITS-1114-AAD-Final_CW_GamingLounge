@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,7 +61,17 @@ public class StationTypeServiceImpl implements StationTypeService{
 
     @Override
     public List<StationTypeDTO> getAllStationTypes() {
-        return List.of();
+        List<StationTypeDTO> list = new ArrayList<>();
+        try {
+            List<StationType> stationTypes = stationTypeRepository.findAll();
+            for (StationType s : stationTypes) {
+                list.add(new StationTypeDTO(s.getId(), s.getTypeName(), s.getHourlyRate()));
+            }
+            log.info("All station types have been retrieved successfully");
+        } catch (Exception e) {
+            log.error("Station types couldn't get", e.getMessage());
+        }
+        return list;
     }
 
     @Override
