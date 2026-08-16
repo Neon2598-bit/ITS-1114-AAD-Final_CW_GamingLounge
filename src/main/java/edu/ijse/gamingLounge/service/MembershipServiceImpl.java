@@ -59,7 +59,23 @@ public class MembershipServiceImpl implements MembershipService {
 
     @Override
     public void updateMembershipStatus(Long id, String status) {
+        Optional<Membership>  membershipOptional = membershipRepository.findById(id);
 
+        if (membershipOptional.isEmpty()) {
+            log.error("Membership Does Not Exist");
+            throw new BusinessException("Membership Does Not Exist");
+        }
+
+        Membership membership = membershipOptional.get();
+
+        try {
+            membership.setStatus(MembershipStatus.valueOf(status));
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid Membership Status");
+            throw new BusinessException("Invalid Membership Status");
+        }
+        membershipRepository.save(membership);
+        log.info("Membership {} status updated to {}",id,status);
     }
 
     @Override
