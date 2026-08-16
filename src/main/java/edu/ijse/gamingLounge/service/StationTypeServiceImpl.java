@@ -76,6 +76,17 @@ public class StationTypeServiceImpl implements StationTypeService{
 
     @Override
     public StationTypeDTO getStationTypeById(Long id) {
+        try {
+            Optional<StationType> optional = stationTypeRepository.findById(id);
+
+            if (optional.isPresent()) {
+                StationType stationType = optional.get();
+                log.info("StationType has be retrieved successfully");
+                return new StationTypeDTO(stationType.getId(), stationType.getTypeName(), stationType.getHourlyRate());
+            }
+        } catch (Exception e) {
+            log.error("Station type of id { }"+id+"couldn't fetch", e.getMessage());
+        }
         return null;
     }
 
