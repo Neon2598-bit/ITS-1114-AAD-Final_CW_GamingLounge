@@ -14,4 +14,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 
     @Query("SELECT f FROM Feedback f JOIN FETCH f.customer JOIN FETCH f.booking")
     List<Feedback> findAllWithDetails();
+
+    @Query(value = "SELECT AVG(rating) FROM feedback", nativeQuery = true)
+    Double findAverageRating();
 }

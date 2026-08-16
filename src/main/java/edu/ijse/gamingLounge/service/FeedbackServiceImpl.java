@@ -95,7 +95,12 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public Double getAverageRating() {
-        return 0.0;
+        try {
+            return feedbackRepository.findAverageRating();
+        } catch (Exception e) {
+            log.error("Error while fetching average rating");
+            return null;
+        }
     }
 
     private FeedbackDTO toDTO(Feedback feedback) {
