@@ -11,4 +11,9 @@ import java.util.Optional;
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
+    @Query("SELECT i FROM Invoice i JOIN FETCH i.payment p JOIN FETCH p.customer")
+    List<Invoice> findAllWithDetails();
+
+    Optional<Invoice> findByPayment_Id(Long paymentId);
+
 }
