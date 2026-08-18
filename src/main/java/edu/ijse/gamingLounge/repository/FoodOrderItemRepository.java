@@ -9,4 +9,7 @@ import java.util.List;
 
 @Repository
 public interface FoodOrderItemRepository extends JpaRepository<FoodOrderItem, Long> {
+
+    @Query("SELECT i FROM FoodOrderItem i JOIN FETCH i.snack WHERE i.foodOrder.id = :orderId")
+    List<FoodOrderItem> findByFoodOrder_Id(Long orderId);
 }

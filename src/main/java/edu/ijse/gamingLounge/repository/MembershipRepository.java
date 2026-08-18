@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MembershipRepository extends JpaRepository<Membership, Long> {
@@ -16,4 +17,6 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
     List<Membership> findAllWithDetails();
 
     List<Membership> findByCustomer_Id(Long customerId);
+
+    Optional<Membership> findFirstByCustomer_IdAndStatus(Long customerId, MembershipStatus status);
 }

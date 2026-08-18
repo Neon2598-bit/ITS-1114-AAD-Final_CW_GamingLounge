@@ -10,4 +10,9 @@ import java.util.List;
 @Repository
 public interface FoodOrderRepository extends JpaRepository<FoodOrder, Long> {
 
+    @Query("SELECT o FROM FoodOrder o JOIN FETCH o.customer")
+    List<FoodOrder> findAllWithDetails();
+
+    List<FoodOrder> findByCustomer_Id(Long customerId);
+
 }
