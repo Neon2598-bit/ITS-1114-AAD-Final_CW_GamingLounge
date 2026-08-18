@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -91,7 +92,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         if (Math.abs(dto.getAmount() - expectedAmount) > 0.01) {
-            throw new BusinessException( "Amount does not match what's owed (expected Rs. " + expectedAmount + ").")
+            throw new BusinessException( "Amount does not match what's owed (expected Rs. " + expectedAmount + ").");
         }
 
         if (paymentRepository.existsByReferenceIdAndPaymentForAndStatus(
@@ -127,7 +128,17 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<PaymentDTO> getAllPayments() {
-        return List.of();
+        List<PaymentDTO> paymentDTOList = new ArrayList<>();
+
+        try {
+            for (Payment payment : paymentRepository.findAllWithDetails()) {
+                paymentDTOList.add(toDTO(payment));
+            }
+            log.info("All payments found successfully for payment {}", paymentDTOList);
+        } catch (Exception e) {
+            log.error("Error while fetching all payments for payment {}", paymentDTOList);
+        }
+        return paymentDTOList;
     }
 
     @Override
@@ -138,5 +149,19 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public List<PaymentDTO> getPaymentsByCustomer(Long customerId) {
         return List.of();
+    }
+
+    private PaymentDTO toDTO(Payment payment) {
+        return new PaymentDTO(
+                payment.getId(),
+                payment.getAmount(),
+                payment.getPaymentMethod().name(),
+                payment.getPaymentFor(),
+                payment.getReferenceId(),
+                payment.getCustomer().getId(),
+                payment.getStatus().name(),
+                payment.getPaymentDate(),
+                payment.getCustomer().getName()
+        )
     }
 }
