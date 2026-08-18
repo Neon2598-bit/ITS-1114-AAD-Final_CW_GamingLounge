@@ -182,6 +182,6 @@ public class PaymentServiceImpl implements PaymentService {
                 payment.getStatus().name(),
                 payment.getPaymentDate(),
                 payment.getCustomer().getName()
-        )
+        );
     }
 }
