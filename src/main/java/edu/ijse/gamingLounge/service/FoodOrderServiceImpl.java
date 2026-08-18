@@ -7,7 +7,7 @@ import edu.ijse.gamingLounge.exception.BusinessException;
 import edu.ijse.gamingLounge.repository.*;
 import edu.ijse.gamingLounge.status.MembershipStatus;
 import edu.ijse.gamingLounge.status.OrderStatus;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class FoodOrderServiceImpl implements FoodOrderService{
     private final FoodOrderRepository foodOrderRepository;
@@ -119,6 +119,7 @@ public class FoodOrderServiceImpl implements FoodOrderService{
             for (FoodOrder o : foodOrderRepository.findAllWithDetails()) {
                 list.add(toDTO(o));
             }
+            log.info("Retrieved {} food orders", list.size());
         } catch (Exception e) {
             log.error("Operation failed: {}", e.getMessage());
         }
@@ -130,6 +131,7 @@ public class FoodOrderServiceImpl implements FoodOrderService{
         try {
             Optional<FoodOrder> optional = foodOrderRepository.findById(id);
             if (optional.isPresent()) {
+                log.info("Retrieved {} food order", optional.get().getId());
                 return toDTO(optional.get());
             }
         } catch (Exception e) {
@@ -145,6 +147,7 @@ public class FoodOrderServiceImpl implements FoodOrderService{
             for (FoodOrder o : foodOrderRepository.findByCustomer_Id(customerId)) {
                 list.add(toDTO(o));
             }
+            log.info("Retrieved {} food orders for customer {}", list.size(), customerId);
         } catch (Exception e) {
             log.error("Operation failed: {}", e.getMessage());
         }
