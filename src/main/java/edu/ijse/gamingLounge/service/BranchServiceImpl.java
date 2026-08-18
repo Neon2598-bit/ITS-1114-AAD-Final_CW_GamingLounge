@@ -47,20 +47,8 @@ public class BranchServiceImpl implements BranchService {
             if (branchOptional.isPresent() && branchOptional.get().isActive()) {
                 Branch branch = branchOptional.get();
 
-                if (branchRepository.existsByBranchName(branchDTO.getBranchName())){
-                    log.error("This branch name already exists: {}", branchDTO.getBranchName());
-                    throw new BusinessException(
-                            "This branch name already exists"
-                    );
-                }
-
                 branch.setBranchName(branchDTO.getBranchName());
                 branch.setAddress(branchDTO.getAddress());
-
-                if (branchRepository.existsByContactNumber(branchDTO.getContactNumber())){
-                    log.error("This number already exists: {}", branchDTO.getContactNumber());
-                    throw new BusinessException("This number already exists");
-                }
 
                 branch.setContactNumber(branchDTO.getContactNumber());
                 branchRepository.save(branch);
@@ -97,7 +85,7 @@ public class BranchServiceImpl implements BranchService {
             for (Branch branch : branchList) {
                 branchDTOList.add(toDTO(branch));
             }
-            log.info("Successfully retrieve all branches from database");
+            log.info("Successfully retrieve all active branches from database");
         } catch (Exception e) {
             log.error("Couldn't load branch list", e.getMessage());
         }
@@ -126,17 +114,17 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     public void restoreBranch(Long branchId) {
-        try {
             Optional<Branch> branchOptional = branchRepository.findById(branchId);
-            if (branchOptional.isPresent()) {
+            if (branchOptional.isPresent() && !branchOptional.get().isActive()) {
                 Branch branch = branchOptional.get();
                 branch.setActive(true);
                 branchRepository.save(branch);
                 log.info("Branch restored");
+            } else if (branchOptional.isPresent() && branchOptional.get().isActive()) {
+                throw new BusinessException("Branch with id " + branchId + " already active", HttpStatus.CONFLICT);
+            } else if (!branchOptional.isPresent()) {
+                throw new BusinessException("Branch with id " + branchId + " not found", HttpStatus.NOT_FOUND);
             }
-        } catch (Exception e) {
-            log.error("Operation failed: {}", e.getMessage());
-        }
     }
 
     @Override

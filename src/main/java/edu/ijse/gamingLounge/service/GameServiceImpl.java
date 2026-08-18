@@ -53,11 +53,6 @@ public class GameServiceImpl implements GameService {
 
         Game game = optional.get();
 
-        if (gameRepository.existsByGameName(dto.getGameName())) {
-            log.info("Game with name {} already exists", dto.getGameName());
-            throw new BusinessException("Game with name " + dto.getGameName() + " already exists", HttpStatus.CONFLICT);
-        }
-
         game.setGameName(dto.getGameName());
         game.setGenre(dto.getGenre());
         game.setAgeRating(dto.getAgeRating());

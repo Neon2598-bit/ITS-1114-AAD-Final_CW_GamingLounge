@@ -10,4 +10,6 @@ public interface MembershipPlanService {
     void deletePlan(Long id);
     List<MembershipPlanDTO> getAllPlans();
     MembershipPlanDTO getPlanById(Long id);
+    void restorePlan(Long id);
+    List<MembershipPlanDTO> getInactivePlans();
 }

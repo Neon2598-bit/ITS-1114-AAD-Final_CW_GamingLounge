@@ -9,4 +9,8 @@ import java.util.List;
 public interface MembershipPlanRepository extends JpaRepository<MembershipPlan, Long> {
     @Query(value = "SELECT * FROM membership_plan ORDER BY price ASC", nativeQuery = true)
     List<MembershipPlan> findAllOrderByPriceNative();
+
+    boolean existsByPlanName(String planName);
+
+    List<MembershipPlan> findByActiveFalse();
 }
