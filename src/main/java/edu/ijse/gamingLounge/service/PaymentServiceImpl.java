@@ -143,12 +143,32 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentDTO getPaymentById(Long id) {
+        try {
+            Optional<Payment> paymentOptional = paymentRepository.findById(id);
+
+            if (paymentOptional.isPresent()) {
+                log.info("Payment found successfully for payment {}", id);
+                return toDTO(paymentOptional.get());
+            }
+        } catch (Exception e) {
+            log.error("Error while fetching payment for payment {}", id);
+        }
         return null;
     }
 
     @Override
     public List<PaymentDTO> getPaymentsByCustomer(Long customerId) {
-        return List.of();
+        List<PaymentDTO> paymentDTOList = new ArrayList<>();
+
+        try {
+            for (Payment payment : paymentRepository.findByCustomer_Id(customerId)) {
+                paymentDTOList.add(toDTO(payment));
+            }
+            log.info("All payments found successfully for customer {} ", customerId);
+        } catch (Exception e) {
+            log.error("Error while fetching payments for customer {}", customerId);
+        }
+        return paymentDTOList;
     }
 
     private PaymentDTO toDTO(Payment payment) {

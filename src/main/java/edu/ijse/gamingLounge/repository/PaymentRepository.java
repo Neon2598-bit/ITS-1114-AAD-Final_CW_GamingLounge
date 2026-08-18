@@ -14,4 +14,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     @Query("SELECT p FROM Payment p JOIN FETCH p.customer")
     List<Payment> findAllWithDetails();
+
+    List<Payment> findByCustomer_Id(Long customerId);
 }
