@@ -13,4 +13,10 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     //JPQL - searches by partial name, case-insensitive
     @Query("SELECT g FROM Game g WHERE LOWER(g.gameName) LIKE (CONCAT ('%', :keyword, '%'))")
     List<Game> searchByName(String keyword);
+
+    boolean existsByGameName(String gameName);
+
+    List<Game> findByActiveTrue();
+    List<Game> findByActiveFalse();
+
 }

@@ -2,9 +2,11 @@ package edu.ijse.gamingLounge.service;
 
 import edu.ijse.gamingLounge.dto.GameDTO;
 import edu.ijse.gamingLounge.entity.Game;
+import edu.ijse.gamingLounge.exception.BusinessException;
 import edu.ijse.gamingLounge.repository.GameRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,12 @@ public class GameServiceImpl implements GameService {
     public void saveGame(GameDTO dto) {
         try {
             Game game = new Game();
+
+            if (gameRepository.existsByGameName(dto.getGameName())) {
+                log.info("Game with name {} already exists", dto.getGameName());
+                throw new BusinessException("Game with name " + dto.getGameName() + " already exists", HttpStatus.CONFLICT);
+            }
+
             game.setGameName(dto.getGameName());
             game.setGenre(dto.getGenre());
             game.setAgeRating(dto.getAgeRating());
@@ -32,30 +40,44 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public void updateGame(GameDTO dto) {
-        try {
-            Optional<Game> optional = gameRepository.findById(dto.getId());
-            if (optional.isPresent()) {
-                Game game = optional.get();
-                game.setGameName(dto.getGameName());
-                game.setGenre(dto.getGenre());
-                game.setAgeRating(dto.getAgeRating());
-                gameRepository.save(game);
-                log.info("Game updated successfully");
-            }
-        } catch (Exception e) {
-            log.error("Couldn't update game from the database", e.getMessage());
+        Optional<Game> optional = gameRepository.findById(dto.getId());
+
+        if (optional.isEmpty()) {
+            log.info("Game with id {} not found", dto.getId());
+            throw new BusinessException("Game with id " + dto.getId() + " not found", HttpStatus.NOT_FOUND);
         }
+
+        if (!optional.get().isActive()) {
+            throw new BusinessException("Game with id " + dto.getId() + " is not active", HttpStatus.GONE);
+        }
+
+        Game game = optional.get();
+
+        if (gameRepository.existsByGameName(dto.getGameName())) {
+            log.info("Game with name {} already exists", dto.getGameName());
+            throw new BusinessException("Game with name " + dto.getGameName() + " already exists", HttpStatus.CONFLICT);
+        }
+
+        game.setGameName(dto.getGameName());
+        game.setGenre(dto.getGenre());
+        game.setAgeRating(dto.getAgeRating());
+        gameRepository.save(game);
+        log.info("Game updated successfully");
     }
 
     @Override
     public void deleteGame(Long id) {
         try {
-            if (gameRepository.existsById(id)) {
-                gameRepository.deleteById(id);
-                log.info("Game deleted successfully from database");
+            Optional<Game> optional = gameRepository.findById(id);
+            if (optional.isPresent()) {
+                Game game = optional.get();
+                game.setActive(false);
+                gameRepository.save(game);
+                log.info("Game marked as inactive");
             }
         } catch (Exception e) {
             log.error("Operation failed: {}", e.getMessage());
+            throw new BusinessException("No Data Found For This ID :", HttpStatus.NO_CONTENT);
         }
     }
 
@@ -63,8 +85,8 @@ public class GameServiceImpl implements GameService {
     public List<GameDTO> getAllGames() {
         List<GameDTO> list = new ArrayList<>();
         try {
-            for (Game g : gameRepository.findAll()) {
-                list.add(new GameDTO(g.getId(), g.getGameName(), g.getGenre(), g.getAgeRating()));
+            for (Game g : gameRepository.findByActiveTrue()) {
+                list.add(toDTO(g));
             }
             log.info("All Games loaded successfully");
         } catch (Exception e) {
@@ -75,17 +97,21 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public GameDTO getGameById(Long id) {
-        try {
-            Optional<Game> optional = gameRepository.findById(id);
-            if (optional.isPresent()) {
-                Game g = optional.get();
-                log.info("Specific game has been found");
-                return new GameDTO(g.getId(), g.getGameName(), g.getGenre(), g.getAgeRating());
-            }
-        } catch (Exception e) {
-            log.error("Game not found by id", e.getMessage());
+        Optional<Game> gameOptional = gameRepository.findById(id);
+
+        if (gameOptional.isEmpty()) {
+            throw new BusinessException("Game with id " + id + " not found", HttpStatus.NOT_FOUND);
         }
-        return null;
+
+        Game game =  gameOptional.get();
+
+        if (!game.isActive()) {
+            throw new BusinessException("Game with id " + id + " is not active", HttpStatus.GONE);
+        }
+
+        log.info("Game loaded successfully");
+        return toDTO(game);
+
     }
 
     @Override
@@ -93,12 +119,45 @@ public class GameServiceImpl implements GameService {
         List<GameDTO> list = new ArrayList<>();
         try {
             for (Game g : gameRepository.searchByName(keyword)) {
-                list.add(new GameDTO(g.getId(), g.getGameName(), g.getGenre(), g.getAgeRating()));
+                list.add(toDTO(g));
             }
             log.info("Game retrieved successfully from database");
         } catch (Exception e) {
             log.error("Game not found with that name", e.getMessage());
         }
         return list;
+    }
+
+    @Override
+    public void restoreGame(Long id) {
+            Optional<Game> optional = gameRepository.findById(id);
+            if (optional.isPresent() && !optional.get().isActive()) {
+                Game game = optional.get();
+                game.setActive(true);
+                gameRepository.save(game);
+                log.info("Game restored");
+            } else if (optional.isPresent() && optional.get().isActive()) {
+                throw new BusinessException("Game with id " + id + " is already active", HttpStatus.CONFLICT);
+            } else if (!optional.isPresent()) {
+                throw new BusinessException("Game with id " + id + " not found", HttpStatus.NOT_FOUND);
+            }
+    }
+
+    @Override
+    public List<GameDTO> getInactiveGames() {
+        List<GameDTO> list = new ArrayList<>();
+        try {
+            for (Game g : gameRepository.findByActiveFalse()) {
+                list.add(toDTO(g));
+            }
+            log.info("Inactive games loaded successfully");
+        } catch (Exception e) {
+            log.error("Couldn't load inactive game list", e.getMessage());
+        }
+        return list;
+    }
+
+    private GameDTO toDTO(Game game) {
+        return new GameDTO(game.getId(), game.getGameName(), game.getGenre(), game.getAgeRating());
     }
 }

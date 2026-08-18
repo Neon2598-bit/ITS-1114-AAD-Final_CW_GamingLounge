@@ -11,4 +11,6 @@ public interface GameService {
     List<GameDTO> getAllGames();
     GameDTO getGameById(Long id);
     List<GameDTO> searchGamesByName(String keyword);
+    void restoreGame(Long id);
+    List<GameDTO> getInactiveGames();
 }

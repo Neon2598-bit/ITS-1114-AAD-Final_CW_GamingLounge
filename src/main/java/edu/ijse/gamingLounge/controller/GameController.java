@@ -55,10 +55,6 @@ public class GameController {
     @GetMapping("/{id}")
     public ResponseEntity<CommonResponse> getById(@PathVariable Long id) {
         GameDTO dto = gameService.getGameById(id);
-        if (dto == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonResponse(ResponseCode.NOT_FOUND, ResponseMessage.NOT_FOUND));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, dto, ResponseMessage.SUCCESS));
     }
@@ -73,5 +69,19 @@ public class GameController {
         }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
+    }
+
+    @GetMapping("/inactive")
+    public ResponseEntity<CommonResponse> getInactiveGames() {
+        List<GameDTO> list = gameService.getInactiveGames();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
+    }
+
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<CommonResponse> restoreGame(@PathVariable Long id) {
+        gameService.restoreGame(id);
+        return ResponseEntity.status(HttpStatus.RESET_CONTENT)
+                .body(new CommonResponse(ResponseCode.RESET_CONTENT,"Content Reset Successfully", ResponseMessage.RESET_CONTENT));
     }
 }
