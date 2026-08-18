@@ -2,9 +2,11 @@ package edu.ijse.gamingLounge.service;
 
 import edu.ijse.gamingLounge.dto.EmployeeDTO;
 import edu.ijse.gamingLounge.entity.Employee;
+import edu.ijse.gamingLounge.exception.BusinessException;
 import edu.ijse.gamingLounge.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,19 +18,22 @@ import java.util.Optional;
 @Slf4j
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void saveEmployee(EmployeeDTO dto) {
         if (employeeRepository.existsByEmail(dto.getEmail())) {
             log.error("An employee with this email already exists: {}", dto.getEmail());
-            throw new edu.ijse.gamingLounge.exception.BusinessException(
+            throw new BusinessException(
                     "An employee with this email already exists.");
         }
         Employee employee = new Employee();
         employee.setName(dto.getName());
         employee.setEmail(dto.getEmail());
         employee.setPhone(dto.getPhone());
-        employee.setPassword(dto.getPassword());
+        // Hash the password BEFORE saving
+        employee.setPassword(passwordEncoder.encode(dto.getPassword()));
+
         employeeRepository.save(employee);
         log.info("Employee saved successfully to database");
     }
@@ -37,7 +42,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void updateEmployee(EmployeeDTO dto) {
         Optional<Employee> optional = employeeRepository.findById(dto.getId());
         if (optional.isEmpty()) {
-            throw new edu.ijse.gamingLounge.exception.BusinessException("Employee not found.");
+            throw new BusinessException("Employee not found.");
         }
         Employee employee = optional.get();
         employee.setName(dto.getName());
