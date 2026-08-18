@@ -16,4 +16,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findAllWithDetails();
 
     List<Payment> findByCustomer_Id(Long customerId);
+
+    @Query(value = "SELECT DATE_FORMAT(payment_date, '%Y-%m') AS month, SUM(amount) AS total " +
+            "FROM payment WHERE status = 'COMPLETED' GROUP BY month ORDER BY month", nativeQuery = true)
+    List<Object[]> findMonthlyRevenue();
 }

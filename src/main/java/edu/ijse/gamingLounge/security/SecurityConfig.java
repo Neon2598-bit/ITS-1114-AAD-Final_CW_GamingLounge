@@ -78,7 +78,8 @@ public class SecurityConfig {
                                 "/api/v1/feedback/average-rating"
                         ).permitAll()
                         .requestMatchers(
-                                "/api/v1/employee/**"
+                                "/api/v1/employee/**",
+                                "/api/v1/analytics/**"
                         ).hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/branch", "/api/v1/station-type",
                                 "/api/v1/game", "/api/v1/snack-category", "/api/v1/membership-plan",
