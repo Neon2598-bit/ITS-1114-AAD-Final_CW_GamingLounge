@@ -2,9 +2,11 @@ package edu.ijse.gamingLounge.service;
 
 import edu.ijse.gamingLounge.dto.BranchDTO;
 import edu.ijse.gamingLounge.entity.Branch;
+import edu.ijse.gamingLounge.exception.BusinessException;
 import edu.ijse.gamingLounge.repository.BranchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ public class BranchServiceImpl implements BranchService {
             Branch branch = new Branch();
             if (branchRepository.existsByBranchName(branchDTO.getBranchName())){
                 log.error("This branch name already exists: {}", branchDTO.getBranchName());
-                throw new edu.ijse.gamingLounge.exception.BusinessException(
+                throw new BusinessException(
                         "This branch name already exists"
                 );
             }
@@ -31,7 +33,7 @@ public class BranchServiceImpl implements BranchService {
 
             if (branchRepository.existsByContactNumber(branchDTO.getContactNumber())){
                 log.error("This number already exists: {}", branchDTO.getContactNumber());
-                throw new edu.ijse.gamingLounge.exception.BusinessException("This number already exists");
+                throw new BusinessException("This number already exists");
             }
 
             branch.setContactNumber(branchDTO.getContactNumber());
@@ -42,12 +44,12 @@ public class BranchServiceImpl implements BranchService {
     @Override
     public void updateBranch(BranchDTO branchDTO) {
             Optional<Branch> branchOptional = branchRepository.findById(branchDTO.getId());
-            if (branchOptional.isPresent()) {
+            if (branchOptional.isPresent() && branchOptional.get().isActive()) {
                 Branch branch = branchOptional.get();
 
                 if (branchRepository.existsByBranchName(branchDTO.getBranchName())){
                     log.error("This branch name already exists: {}", branchDTO.getBranchName());
-                    throw new edu.ijse.gamingLounge.exception.BusinessException(
+                    throw new BusinessException(
                             "This branch name already exists"
                     );
                 }
@@ -57,7 +59,7 @@ public class BranchServiceImpl implements BranchService {
 
                 if (branchRepository.existsByContactNumber(branchDTO.getContactNumber())){
                     log.error("This number already exists: {}", branchDTO.getContactNumber());
-                    throw new edu.ijse.gamingLounge.exception.BusinessException("This number already exists");
+                    throw new BusinessException("This number already exists");
                 }
 
                 branch.setContactNumber(branchDTO.getContactNumber());
@@ -66,20 +68,24 @@ public class BranchServiceImpl implements BranchService {
 
             } else {
                 log.error("Couldn't find any branch with this id {}", branchDTO.getId());
-                throw new edu.ijse.gamingLounge.exception.BusinessException("Couldn't find any branch with this id");
+                throw new BusinessException("Couldn't find any branch with this id");
             }
     }
 
     @Override
     public void deleteBranch(Long branchId) {
             Optional<Branch> branchOptional = branchRepository.findById(branchId);
+
             if (branchOptional.isPresent()) {
-                branchRepository.deleteById(branchId);
-                log.info("Branch deleted successfully from database");
+                Branch branch = branchOptional.get();
+                branch.setActive(false);
+
+                branchRepository.save(branch);
+
+                log.info("Branch marked as inactive");
             } else {
                 log.error("Couldn't find any branch with id {}", branchId);
-                throw new edu.ijse.gamingLounge.exception
-                        .BusinessException("Couldn't find any branch with id " + branchId);
+                throw new BusinessException("Couldn't find any branch with id " + branchId);
             }
     }
 
@@ -87,14 +93,9 @@ public class BranchServiceImpl implements BranchService {
     public List<BranchDTO> getAllBranches() {
         List<BranchDTO> branchDTOList = new ArrayList<>();
         try {
-            List<Branch> branchList = branchRepository.findAll();
+            List<Branch> branchList = branchRepository.findByActiveTrue();
             for (Branch branch : branchList) {
-                branchDTOList.add(new BranchDTO(
-                        branch.getId(),
-                        branch.getBranchName(),
-                        branch.getAddress(),
-                        branch.getContactNumber()
-                ));
+                branchDTOList.add(toDTO(branch));
             }
             log.info("Successfully retrieve all branches from database");
         } catch (Exception e) {
@@ -105,22 +106,60 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     public BranchDTO getBranchById(Long branchId) {
+        Optional<Branch> branchOptional = branchRepository.findById(branchId);
+
+        if (branchOptional.isEmpty()) {
+            log.error("Couldn't find any branch with id {}", branchId);
+            throw new BusinessException("Couldn't find any branch with id " + branchId, HttpStatus.NOT_FOUND);
+        }
+
+        Branch branch = branchOptional.get();
+
+        if (!branch.isActive()) {
+            log.info("Branch with id {} is not active", branchId);
+            throw new BusinessException("Branch with id " + branchId + " is not active", HttpStatus.NOT_FOUND);
+        }
+
+        log.info("Successfully fetch the specific branch from database");
+        return toDTO(branch);
+    }
+
+    @Override
+    public void restoreBranch(Long branchId) {
         try {
             Optional<Branch> branchOptional = branchRepository.findById(branchId);
             if (branchOptional.isPresent()) {
                 Branch branch = branchOptional.get();
-                log.info("Successfully fetch the specific branch from database");
-                return new BranchDTO(
-                        branch.getId(),
-                        branch.getBranchName(),
-                        branch.getAddress(),
-                        branch.getContactNumber()
-                );
+                branch.setActive(true);
+                branchRepository.save(branch);
+                log.info("Branch restored");
             }
-
         } catch (Exception e) {
-            log.error("Couldn't find the branch", e.getMessage());
+            log.error("Operation failed: {}", e.getMessage());
         }
-        return null;
+    }
+
+    @Override
+    public List<BranchDTO> getInactiveBranches() {
+        List<BranchDTO> branchDTOList = new ArrayList<>();
+        try {
+            List<Branch> branchList = branchRepository.findByActiveFalse();
+            for (Branch branch : branchList) {
+                branchDTOList.add(toDTO(branch));
+            }
+            log.info("Successfully retrieve inactive branches from database");
+        } catch (Exception e) {
+            log.error("Couldn't load inactive branch list", e.getMessage());
+        }
+        return branchDTOList;
+    }
+
+    private BranchDTO toDTO(Branch branch) {
+        return new BranchDTO(
+                branch.getId(),
+                branch.getBranchName(),
+                branch.getAddress(),
+                branch.getContactNumber()
+        );
     }
 }

@@ -55,11 +55,21 @@ public class BranchController {
     @GetMapping("/{id}")
     public ResponseEntity<CommonResponse> getBranchById(@PathVariable Long id) {
         BranchDTO branchDTO = branchService.getBranchById(id);
-        if (branchDTO == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonResponse(ResponseCode.NOT_FOUND, ResponseMessage.NOT_FOUND));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, branchDTO, ResponseMessage.SUCCESS));
+    }
+
+    @GetMapping("/inactive")
+    public ResponseEntity<CommonResponse> getInactiveBranches() {
+        List<BranchDTO> branchList = branchService.getInactiveBranches();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, branchList, ResponseMessage.SUCCESS));
+    }
+
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<CommonResponse> restoreBranch(@PathVariable Long id) {
+        branchService.restoreBranch(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
     }
 }

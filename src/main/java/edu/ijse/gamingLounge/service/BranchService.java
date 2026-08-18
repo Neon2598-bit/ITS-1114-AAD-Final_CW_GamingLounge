@@ -10,4 +10,7 @@ public interface BranchService {
     void deleteBranch(Long branchId);
     List<BranchDTO> getAllBranches();
     BranchDTO getBranchById(Long branchId);
+
+    void restoreBranch(Long branchId);
+    List<BranchDTO> getInactiveBranches();
 }

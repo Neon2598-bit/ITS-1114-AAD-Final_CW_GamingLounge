@@ -21,6 +21,7 @@ import java.util.List;
 public class StationController {
     private final StationService stationService;
 
+    @PostMapping
     public ResponseEntity<CommonResponse> save(@Valid @RequestBody StationDTO dto){
         stationService.saveStation(dto);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -63,6 +64,7 @@ public class StationController {
                 .body(new CommonResponse(ResponseCode.SUCCESS, dto, ResponseMessage.SUCCESS));
     }
 
+    @GetMapping("/available")
     public ResponseEntity<CommonResponse> getAvailable(@RequestParam Long branchId) {
         List<StationDTO> list = stationService.getAvailableStationsByBranch(branchId);
         if (list.isEmpty()) {

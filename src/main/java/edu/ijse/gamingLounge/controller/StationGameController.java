@@ -28,7 +28,7 @@ public class StationGameController {
                 .body(new CommonResponse(ResponseCode.CREATED, ResponseMessage.SUCCESS));
     }
 
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public ResponseEntity<CommonResponse> delete(@PathVariable Long id) {
         stationGameService.deleteStationGame(id);
         return ResponseEntity.status(HttpStatus.OK)
