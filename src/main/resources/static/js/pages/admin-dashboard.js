@@ -147,3 +147,20 @@ function loadInactive(key) {
         renderInactiveTable(key, response.body);
     });
 }
+
+function crudRestore(key, id) {
+    $.ajax({
+        url: API_BASE + CRUD[key].endpoint + "/" + id + "/restore",
+        type: "PUT",
+        success: function () {
+            showCrudSuccess(key, "Restored.");
+            loadCrud(key);
+            loadInactive(key);
+        },
+        error: function (xhr) { showCrudError(key, xhr); }
+    });
+}
+
+function restoreBtn(key, row) {
+    return '<button class="secondary" onclick="crudRestore(\'' + key + '\', ' + row.id + ')">Restore</button>';
+}
