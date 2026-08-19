@@ -45,3 +45,30 @@ function handleLogin() {
 function showError(message) {
     $('#errorMsg').text(message).show();
 }
+
+function handleGuestLogin() {
+    $('#errorMsg').hide();
+    $.ajax({
+        url: API_BASE + "/auth/guest-token",
+        type: "POST",
+        success: function (response) {
+
+            const body = response.body;
+
+            localStorage.setItem("userId", "");
+            localStorage.setItem("token", body.token);
+            localStorage.setItem("role", body.role);
+            localStorage.setItem("name", body.name);
+
+            window.location.href = "customer-dashboard.html";
+        },
+
+        error: function () {
+            showError("Could Not Start A Guest Session, Please Try Again...");
+        }
+    });
+}
+
+$(document).on('keypress', function (e) {
+    if (e.which === 13) handleLogin;
+});
