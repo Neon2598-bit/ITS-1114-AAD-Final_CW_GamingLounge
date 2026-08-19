@@ -20,6 +20,14 @@ const SECTIONS = [
     { key: "branch", label: "Branches" }
 ];
 
+const ROW_CACHE = {};
+
+const ROW_RENDERERS = {};
+
+const INACTIVE_VISIBLE = {};
+
+const INACTIVE_ROW_RENDERERS = {};
+
 function showSection(key) {
     $('.section').removeClass('active');
     $('.section[data-section="' + key + '"]').addClass('active');
@@ -46,15 +54,6 @@ function showCrudSuccess(key, text) {
     $('#' + key + '-success').text(text).show();
 }
 
-function fillSelect(selector, endpoint, valueField, labelFn) {
-    return $.get(API_BASE + endpoint, function (response) {
-        const options = response.body.map(function (r) {
-            return '<option value="' + r[valueField] + '">' + labelFn(r) + '</option>';
-        });
-        $(selector).html(options.join(''));
-    });
-}
-
 // ---- Generic Save (handles both create and update)
 function crudSave(key) {
     const cfg = CRUD[key];
@@ -78,5 +77,43 @@ function crudSave(key) {
             loadCrud(key);
         },
         error: function (xhr) { showCrudError(key, xhr); }
+    });
+}
+
+function crudResetForm(key) {
+    const cfg = CRUD[key];
+    $('#' + key + '-id').remove();
+    cfg.fields.forEach(function (f) { $('#' + key + '-' + f).val(''); });
+    if (key === 'game') $('#game-ageRating').val('T');
+    if (key === 'station') $('#station-status').val('AVAILABLE');
+}
+
+function crudEdit(key, id) {
+    const cfg = CRUD[key];
+    const row = ROW_CACHE[key][id];
+    if ($('#' + key + '-id').length === 0) {
+        $('<input type="hidden" id="' + key + '-id">').appendTo('body');
+    }
+    $('#' + key + '-id').val(row.id);
+    cfg.fields.forEach(function (f) {
+        if (key === 'employee' && f === 'password') return;
+        $('#' + key + '-' + f).val(row[f]);
+    });
+    $('html, body').animate({ scrollTop: 0 }, 200);
+}
+
+function crudDelete(key, id) {
+    if (!confirm("Delete this record? This cannot be undone.")) return;
+    $.ajax({
+        url: API_BASE + CRUD[key].endpoint + "/" + id,
+        type: "DELETE",
+        success: function () { showCrudSuccess(key, "Deleted."); loadCrud(key); },
+        error: function (xhr) { showCrudError(key, xhr); }
+    });
+}
+
+function loadCrud(key) {
+    $.get(API_BASE + CRUD[key].endpoint, function (response) {
+        renderTable(key, response.body);
     });
 }
