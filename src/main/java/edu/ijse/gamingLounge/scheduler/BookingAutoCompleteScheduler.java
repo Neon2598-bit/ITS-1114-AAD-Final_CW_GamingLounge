@@ -1,4 +1,4 @@
-package edu.ijse.gamingLounge.sheduler;
+package edu.ijse.gamingLounge.scheduler;
 
 import edu.ijse.gamingLounge.repository.BookingRepository;
 import edu.ijse.gamingLounge.service.BookingService;

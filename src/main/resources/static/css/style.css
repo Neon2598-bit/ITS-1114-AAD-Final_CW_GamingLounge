@@ -1,0 +1,118 @@
+:root {
+    --bg: #0f1117;
+    --panel: #171a23;
+    --border: #2a2e3a;
+    --text: #e8e9ed;
+    --text-dim: #9497a3;
+    --primary: #6c5ce7;
+    --primary-hover: #7d6ef0;
+    --success: #2ecc71;
+    --danger: #e74c3c;
+    --font: 'Segoe UI', Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+}
+
+/* ---- Centered auth card (login/register/otp) ---- */
+.auth-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 32px;
+    width: 100%;
+    max-width: 380px;
+}
+
+.card h1 {
+    margin: 0 0 6px;
+    font-size: 22px;
+}
+
+.card p.subtitle {
+    margin: 0 0 24px;
+    color: var(--text-dim);
+    font-size: 14px;
+}
+
+.field {
+    margin-bottom: 16px;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+.field input, .field select, .field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: var(--font);
+}
+
+.field input:focus, .field select:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+button, .btn {
+    width: 100%;
+    padding: 11px;
+    background: var(--primary);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button:hover, .btn:hover { background: var(--primary-hover); }
+
+button.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+
+.switch-line {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+.switch-line a { color: var(--primary); text-decoration: none; }
+
+.error-msg {
+    background: rgba(231, 76, 60, 0.12);
+    border: 1px solid var(--danger);
+    color: #ff8a80;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+}
