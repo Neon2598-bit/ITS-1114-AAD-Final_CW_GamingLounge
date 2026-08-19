@@ -4,12 +4,14 @@ import edu.ijse.gamingLounge.dto.StationDTO;
 import edu.ijse.gamingLounge.entity.Branch;
 import edu.ijse.gamingLounge.entity.Station;
 import edu.ijse.gamingLounge.entity.StationType;
+import edu.ijse.gamingLounge.exception.BusinessException;
 import edu.ijse.gamingLounge.repository.BranchRepository;
 import edu.ijse.gamingLounge.repository.StationRepository;
 import edu.ijse.gamingLounge.repository.StationTypeRepository;
 import edu.ijse.gamingLounge.status.StationStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,55 +28,59 @@ public class StationServiceImpl implements StationService {
 
     @Override
     public void saveStation(StationDTO dto) {
-        try {
-            Optional<Branch> branchOptional = branchRepository.findById(dto.getBranchId());
-            Optional<StationType> typeOptional = stationTypeRepository.findById(dto.getStationTypeId());
+        Optional<Branch> branchOptional = branchRepository.findById(dto.getBranchId());
+        Optional<StationType> typeOptional = stationTypeRepository.findById(dto.getStationTypeId());
 
-            if (branchOptional.isPresent() && typeOptional.isPresent()) {
-                Station station = new Station();
-                station.setStationCode(dto.getStationCode());
-                station.setStatus(StationStatus.valueOf(dto.getStatus()));
-                station.setBranch(branchOptional.get());
-                station.setStationType(typeOptional.get());
-                stationRepository.save(station);
-                log.info("Station saved successfully to database");
-            }
-        } catch (Exception e) {
-            log.error("Couldn't done saving...!", e.getMessage());
+        if (branchOptional.isEmpty() || typeOptional.isEmpty()) {
+            throw new BusinessException("Branch or type not found.", HttpStatus.NOT_FOUND);
         }
+
+        if (!branchOptional.get().isActive() || !typeOptional.get().isActive()) {
+            throw new BusinessException("Branch or type is not in active state.",HttpStatus.GONE);
+        }
+
+        Station station = new Station();
+        station.setStationCode(dto.getStationCode());
+        station.setStatus(StationStatus.valueOf(dto.getStatus()));
+        station.setBranch(branchOptional.get());
+        station.setStationType(typeOptional.get());
+        stationRepository.save(station);
+        log.info("Station saved successfully to database");
     }
 
     @Override
     public void updateStation(StationDTO dto) {
-        try {
-            Optional<Station> stationOptional = stationRepository.findById(dto.getId());
-            Optional<Branch> branchOptional = branchRepository.findById(dto.getBranchId());
-            Optional<StationType> typeOptional = stationTypeRepository.findById(dto.getStationTypeId());
+        Optional<Station> stationOptional = stationRepository.findById(dto.getId());
+        Optional<Branch> branchOptional = branchRepository.findById(dto.getBranchId());
+        Optional<StationType> typeOptional = stationTypeRepository.findById(dto.getStationTypeId());
 
-            if (stationOptional.isPresent() && branchOptional.isPresent() && typeOptional.isPresent()) {
-                Station station = stationOptional.get();
-                station.setStationCode(dto.getStationCode());
-                station.setStatus(StationStatus.valueOf(dto.getStatus()));
-                station.setBranch(branchOptional.get());
-                station.setStationType(typeOptional.get());
-                stationRepository.save(station);
-                log.info("Station updated successfully ...!");
-            }
-        } catch (Exception e) {
-            log.error("Updation failed....", e.getMessage());
+        if (stationOptional.isEmpty() || branchOptional.isEmpty() || typeOptional.isEmpty()) {
+            throw new BusinessException("Branch,Station Type or Station not found.", HttpStatus.NOT_FOUND);
         }
+
+        if (!branchOptional.get().isActive() || !typeOptional.get().isActive() || !stationOptional.get().isActive()) {
+            throw new BusinessException("Branch,Station Type or Station Is Not In Active State.", HttpStatus.GONE);
+        }
+        Station station = stationOptional.get();
+        station.setStationCode(dto.getStationCode());
+        station.setStatus(StationStatus.valueOf(dto.getStatus()));
+        station.setBranch(branchOptional.get());
+        station.setStationType(typeOptional.get());
+        stationRepository.save(station);
+        log.info("Station updated successfully ...!");
+
     }
 
     @Override
     public void deleteStation(Long id) {
-        try {
-            if (stationRepository.existsById(id)) {
-                stationRepository.deleteById(id);
-                log.info("Specific station has been deleted successfully");
-            }
-        } catch (Exception e) {
-            log.error("Operation failed: Couldn't delete", e.getMessage());
+        Optional<Station> stationOptional = stationRepository.findById(id);
+        if  (stationOptional.isEmpty()) {
+            throw new BusinessException("Station not found.", HttpStatus.NOT_FOUND);
         }
+        Station station = stationOptional.get();
+        station.setActive(false);
+        stationRepository.save(station);
+        log.info("Station marked as inactive (soft delete)");
     }
 
     @Override
@@ -109,13 +115,42 @@ public class StationServiceImpl implements StationService {
     public List<StationDTO> getAvailableStationsByBranch(Long branchId) {
         List<StationDTO> list = new ArrayList<>();
         try {
-            List<Station> stations = stationRepository.findByBranch_IdAndStatus(branchId, StationStatus.AVAILABLE);
+            List<Station> stations = stationRepository.findByBranch_IdAndStatusAndActiveTrue(branchId, StationStatus.AVAILABLE);
             for (Station s : stations) {
                 list.add(toDTO(s));
             }
             log.info("Currently available stations retrieved successfully according to the specific branch");
         } catch (Exception e) {
             log.error("No available stations at specific branch", e.getMessage());
+        }
+        return list;
+    }
+
+    @Override
+    public void restoreStation(Long id) {
+        Optional<Station> stationOptional = stationRepository.findById(id);
+        if (stationOptional.isEmpty()) {
+            throw new BusinessException("Station not found.", HttpStatus.NOT_FOUND);
+        }
+        if (stationOptional.get().isActive()) {
+            throw new BusinessException("Station is already active.", HttpStatus.BAD_REQUEST);
+        }
+        Station station = stationOptional.get();
+        station.setActive(true);
+        stationRepository.save(station);
+        log.info("Station restored");
+    }
+
+    @Override
+    public List<StationDTO> getInactiveStations() {
+        List<StationDTO> list = new ArrayList<>();
+        try {
+            for (Station s : stationRepository.findByActiveFalse()) {
+                list.add(toDTO(s));
+            }
+            log.info("Inactive stations retrieved successfully");
+        } catch (Exception e) {
+            log.error("Couldn't retrieve inactive stations", e.getMessage());
         }
         return list;
     }

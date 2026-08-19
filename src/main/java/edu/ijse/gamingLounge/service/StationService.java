@@ -11,4 +11,6 @@ public interface StationService {
     List<StationDTO> getAllStations();
     StationDTO getStationById(Long id);
     List<StationDTO> getAvailableStationsByBranch(Long branchId);
+    void restoreStation(Long id);
+    List<StationDTO> getInactiveStations();
 }

@@ -74,4 +74,22 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }
+
+    @GetMapping("/inactive")
+    public ResponseEntity<CommonResponse> getInactiveStations() {
+        List<StationDTO> list = stationService.getInactiveStations();
+        if (list.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new CommonResponse(ResponseCode.NOT_FOUND, list, ResponseMessage.NOT_FOUND));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
+    }
+
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<CommonResponse> restoreStation(@PathVariable Long id) {
+        stationService.restoreStation(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
+    }
 }

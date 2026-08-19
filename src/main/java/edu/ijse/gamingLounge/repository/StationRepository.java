@@ -10,8 +10,9 @@ import java.util.List;
 
 @Repository
 public interface StationRepository extends JpaRepository<Station, Long> {
-    @Query("SELECT s FROM Station s JOIN FETCH s.branch JOIN FETCH s.stationType")
+    @Query("SELECT s FROM Station s JOIN FETCH s.branch JOIN FETCH s.stationType WHERE s.active = true")
     List<Station> findAllWithDetails();
 
-    List<Station> findByBranch_IdAndStatus(Long branchId, StationStatus status);
+    List<Station> findByBranch_IdAndStatusAndActiveTrue(Long branchId, StationStatus status);
+    List<Station> findByActiveFalse();
 }
