@@ -134,3 +134,16 @@ function renderTable(key, rows) {
     }
     body.html(ROW_RENDERERS[key](rows));
 }
+
+function toggleInactive(key) {
+    INACTIVE_VISIBLE[key] = !INACTIVE_VISIBLE[key];
+    $('#' + key + '-inactive-table').toggle(INACTIVE_VISIBLE[key]);
+    $('#' + key + '-inactive-toggle').text((INACTIVE_VISIBLE[key] ? 'Hide' : 'Show') + ' Deleted ' + (CRUD_LABEL[key] || key));
+    if (INACTIVE_VISIBLE[key]) loadInactive(key);
+}
+
+function loadInactive(key) {
+    $.get(API_BASE + CRUD[key].endpoint + "/inactive", function (response) {
+        renderInactiveTable(key, response.body);
+    });
+}
