@@ -44,6 +44,10 @@ public class SnackController {
     @GetMapping
     public ResponseEntity<CommonResponse> getAll() {
         List<SnackDTO> list = snackService.getAllSnacks();
+        if (list.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new CommonResponse(ResponseCode.NOT_FOUND, ResponseMessage.NOT_FOUND));
+        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }
@@ -51,10 +55,6 @@ public class SnackController {
     @GetMapping("/{id}")
     public ResponseEntity<CommonResponse> getById(@PathVariable Long id) {
         SnackDTO dto = snackService.getSnackById(id);
-        if (dto == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonResponse(ResponseCode.NOT_FOUND, ResponseMessage.NOT_FOUND));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, dto, ResponseMessage.SUCCESS));
     }
@@ -65,5 +65,23 @@ public class SnackController {
         List<SnackDTO> list = snackService.getLowStockSnacks(threshold);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
+    }
+
+    @GetMapping("/inactive")
+    public ResponseEntity<CommonResponse> getInactiveSnacks() {
+        List<SnackDTO> list = snackService.getInactiveSnacks();
+        if (list.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new CommonResponse(ResponseCode.NOT_FOUND, ResponseMessage.NOT_FOUND));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
+    }
+
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<CommonResponse> restoreSnack(@PathVariable Long id) {
+        snackService.restoreSnack(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
     }
 }

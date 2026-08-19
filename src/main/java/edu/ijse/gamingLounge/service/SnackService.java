@@ -11,4 +11,6 @@ public interface SnackService {
     List<SnackDTO> getAllSnacks();
     SnackDTO getSnackById(Long id);
     List<SnackDTO> getLowStockSnacks(Integer threshold);
+    void restoreSnack(Long id);
+    List<SnackDTO> getInactiveSnacks();
 }
