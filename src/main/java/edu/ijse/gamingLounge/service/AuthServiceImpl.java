@@ -10,6 +10,7 @@ import edu.ijse.gamingLounge.repository.EmployeeRepository;
 import edu.ijse.gamingLounge.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
                         log.error("Login blocked - email not verified: {}", dto.getEmail());
                         throw new BusinessException(
                                 "Please verify your email with the OTP sent to you before logging in.",
-                                org.springframework.http.HttpStatus.FORBIDDEN);
+                                HttpStatus.FORBIDDEN);
                     }
                     String token = jwtUtil.generateToken(customer.getEmail(), "USER");
                     log.info("Customer logged in: {}", customer.getEmail());

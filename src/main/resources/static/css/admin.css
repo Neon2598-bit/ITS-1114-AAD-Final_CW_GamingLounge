@@ -1,0 +1,38 @@
+.admin-shell { display: flex; min-height: calc(100vh - 57px); }
+
+.sidebar {
+    width: 210px;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    padding: 16px 0;
+    flex-shrink: 0;
+}
+
+.sidebar button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 0;
+    cursor: pointer;
+}
+
+.sidebar button:hover { background: var(--bg); color: var(--text); }
+.sidebar button.active { background: var(--bg); color: var(--primary); border-right: 3px solid var(--primary); }
+
+.admin-main { flex: 1; padding: 24px; max-width: 1000px; }
+/*.section { display: none; }*/
+.section.active { display: block; }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0 16px;
+}
+.form-actions { display: flex; gap: 10px; margin-top: 4px; }
+.form-actions button { width: auto; padding: 10px 20px; }

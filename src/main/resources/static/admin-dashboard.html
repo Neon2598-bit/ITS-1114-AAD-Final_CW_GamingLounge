@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard // Gaming Lounge System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand">🎮 Gaming Lounge - Admin</div>
+    <div class="user-info">
+        <span id="welcomeText"></span>
+        <button class="secondary" style="width:auto; padding:6px 14px; margin-left:14px" onclick="logout()">Logout</button>
+    </div>
+</div>
+
+<div class="admin-shell">
+    <div class="sidebar" id="sidebarNav"></div>
+
+    <div class="admin-main">
+
+        <div class="section" data-section="branch">
+            <h2>Branches</h2>
+            <div class="error-msg" id="branch-error"></div>
+            <div class="success-msg" id="branch-success"></div>
+            <div class="card" style="max-width:100%; margin-bottom:20px;">
+                <div class="form-grid">
+                    <div class="field"><label>Branch Name</label><input id="branch-branchName"></div>
+                    <div class="field"><label>Address</label><input id="branch-address"></div>
+                    <div class="field"><label>Contact Number</label><input id="branch-contactNumber" placeholder="10 digits"></div>
+                </div>
+                <div class="form-actions">
+                    <button onclick="crudSave('branch')">Save</button>
+                    <button class="secondary" onclick="crudResetForm('branch')">Clear</button>
+                </div>
+            </div>
+            <table><thead><tr><th>Name</th><th>Address</th><th>Contact</th><th>Actions</th></tr></thead>
+                <tbody id="branch-body"></tbody></table>
+
+            <button class="secondary" style="margin-top:16px" onclick="toggleInactive('branch')" id="branch-inactive-toggle">Show Deleted Branches</button>
+            <table id="branch-inactive-table" style="display:none; margin-top:10px">
+                <thead><tr><th>Name</th><th>Address</th><th>Contact</th><th>Actions</th></tr></thead>
+                <tbody id="branch-inactive-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="lib/jquery-4.0.0.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/pages/admin-dashboard.js"></script>
+</body>
+</html>
