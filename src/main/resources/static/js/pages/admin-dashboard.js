@@ -28,6 +28,8 @@ const INACTIVE_VISIBLE = {};
 
 const INACTIVE_ROW_RENDERERS = {};
 
+const INACTIVE_ROW_CACHE = {};
+
 function showSection(key) {
     $('.section').removeClass('active');
     $('.section[data-section="' + key + '"]').addClass('active');
@@ -164,3 +166,35 @@ function crudRestore(key, id) {
 function restoreBtn(key, row) {
     return '<button class="secondary" onclick="crudRestore(\'' + key + '\', ' + row.id + ')">Restore</button>';
 }
+
+function renderInactiveTable(key, rows) {
+    const body = $('#' + key + '-inactive-body');
+    INACTIVE_ROW_CACHE[key] = {};
+    (rows || []).forEach(function (r) { INACTIVE_ROW_CACHE[key][r.id] = r; });
+
+    if (!rows || rows.length === 0) {
+        body.html('<tr><td colspan="8" style="color:var(--text-dim)">No deleted records.</td></tr>');
+        return;
+    }
+    if (!INACTIVE_ROW_RENDERERS[key]) return;
+    body.html(INACTIVE_ROW_RENDERERS[key](rows));
+}
+
+// =============================================================================
+// 3. ENTITY SECTIONS
+// =============================================================================
+
+// ---- BRANCH --------------------------------------------------------------
+ROW_RENDERERS.branch = function (rows) {
+    return rows.map(r => '<tr><td>' + r.branchName + '</td><td>' + r.address + '</td><td>' + r.contactNumber + '</td><td>' + actionBtns('branch', r) + '</td></tr>').join('');
+};
+INACTIVE_ROW_RENDERERS.branch = function (rows) {
+    return rows.map(r => '<tr><td>' + r.branchName + '</td><td>' + r.address + '</td><td>' + r.contactNumber + '</td><td>' + restoreBtn('branch', r) + '</td></tr>').join('');
+};
+
+// =============================================================================
+// PAGE INIT - load every simple CRUD table, plus the special screens
+// =============================================================================
+Object.keys(CRUD).forEach(function (key) {
+    if (key !== 'station' && key !== 'snack') loadCrud(key);
+});

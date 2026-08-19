@@ -127,3 +127,36 @@ button.secondary {
     margin-bottom: 16px;
     display: none;
 }
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+}
+
+.topbar .brand { font-weight: 700; font-size: 16px; }
+
+.topbar .user-info { color: var(--text-dim); font-size: 13px; }
+
+.container { padding: 24px; max-width: 1100px; margin: 0 auto; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+}
+
+th { color: var(--text-dim); font-weight: 600; font-size: 12px; text-transform: uppercase; }

@@ -26,7 +26,7 @@
 .sidebar button.active { background: var(--bg); color: var(--primary); border-right: 3px solid var(--primary); }
 
 .admin-main { flex: 1; padding: 24px; max-width: 1000px; }
-.section { display: none; }
+/*.section { display: none; }*/
 .section.active { display: block; }
 
 .form-grid {
@@ -36,3 +36,8 @@
 }
 .form-actions { display: flex; gap: 10px; margin-top: 4px; }
 .form-actions button { width: auto; padding: 10px 20px; }
+
+table button { width: auto; padding: 6px 12px; font-size: 12px; margin-right: 6px; }
+table button.secondary { background: transparent; border: 1px solid var(--border); }
+table button.danger { background: var(--danger); }
+table button.danger:hover { background: #f0574a; }
