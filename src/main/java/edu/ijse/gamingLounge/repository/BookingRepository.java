@@ -1,6 +1,7 @@
 package edu.ijse.gamingLounge.repository;
 
 import edu.ijse.gamingLounge.entity.Booking;
+import edu.ijse.gamingLounge.status.BookingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,4 +14,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllWithDetails();
 
     List<Booking> findByCustomer_Id(Long customerId);
+
+    List<Booking> findByStatusAndEndTimeBefore(BookingStatus status, java.time.LocalDateTime time);
 }
