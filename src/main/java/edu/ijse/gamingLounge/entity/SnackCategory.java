@@ -1,9 +1,6 @@
 package edu.ijse.gamingLounge.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,4 +14,6 @@ public class SnackCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String categoryName;
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
+    private boolean active = true;
 }

@@ -10,4 +10,6 @@ public interface SnackCategoryService {
     void deleteCategory(Long id);
     List<SnackCategoryDTO> getAllCategories();
     SnackCategoryDTO getCategoryById(Long id);
+    void restoreCategory(Long id);
+    List<SnackCategoryDTO> getInactiveCategories();
 }
