@@ -2,9 +2,11 @@ package edu.ijse.gamingLounge.service;
 
 import edu.ijse.gamingLounge.dto.CustomerDTO;
 import edu.ijse.gamingLounge.entity.Customer;
+import edu.ijse.gamingLounge.exception.BusinessException;
 import edu.ijse.gamingLounge.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,11 +26,14 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             if (customerRepository.existsByEmail(dto.getEmail())) {
                 log.error("A customer with this email already exists: {}", dto.getEmail());
-                return null;
+                throw new BusinessException("Customer with this email already exists", HttpStatus.CONFLICT);
             }
             Customer customer = new Customer();
             customer.setName(dto.getName());
             customer.setEmail(dto.getEmail());
+            if (customerRepository.existsByPhone(dto.getPhone())) {
+                throw new BusinessException("This phone number already exists", HttpStatus.CONFLICT);
+            }
             customer.setPhone(dto.getPhone());
             // Hash the password BEFORE saving
             customer.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -39,37 +44,45 @@ public class CustomerServiceImpl implements CustomerService {
             return saved.getId();
         } catch (Exception e) {
             log.error("Customer saving got an error: {}", e.getMessage());
-            return null;
+            throw new  BusinessException("Customer saving got an error", HttpStatus.NOT_ACCEPTABLE);
         }
     }
 
     @Override
     public void updateCustomer(CustomerDTO dto) {
-        try {
-            Optional<Customer> optional = customerRepository.findById(dto.getId());
-            if (optional.isPresent()) {
-                Customer customer = optional.get();
-                customer.setName(dto.getName());
-                customer.setEmail(dto.getEmail());
-                customer.setPhone(dto.getPhone());
-                customer.setAddress(dto.getAddress());
-                customerRepository.save(customer);
-                log.info("Customer updated successfully...");
-            }
-        } catch (Exception e) {
-            log.error("Customer updation failed: {}", e.getMessage());
+        Optional<Customer> customerOptional = customerRepository.findById(dto.getId());
+        if (customerOptional.isEmpty()) {
+            throw new BusinessException("Customer not found", HttpStatus.NOT_FOUND);
         }
+
+        if (!customerOptional.get().isActive()) {
+            throw new BusinessException("Customer not active", HttpStatus.BAD_REQUEST);
+        }
+        Customer customer = customerOptional.get();
+        customer.setName(dto.getName());
+        customer.setEmail(dto.getEmail());
+        if (customerRepository.existsByPhone(dto.getPhone())) {
+            throw new BusinessException("This phone number already exists", HttpStatus.CONFLICT);
+        }
+        customer.setPhone(dto.getPhone());
+        customer.setAddress(dto.getAddress());
+        customerRepository.save(customer);
+        log.info("Customer updated successfully...");
     }
 
     @Override
     public void deleteCustomer(Long id) {
         try {
-            if (customerRepository.existsById(id)) {
-                customerRepository.deleteById(id);
-                log.info("Customer deleted successfully from database");
+            Optional<Customer> optional = customerRepository.findById(id);
+            if (optional.isEmpty()) {
+                throw new BusinessException("Customer not found", HttpStatus.NOT_FOUND);
             }
+            Customer customer = optional.get();
+            customer.setActive(false);
+            customerRepository.save(customer);
+            log.info("Customer marked as inactive.");
         } catch (Exception e) {
-            log.error("Customer deletion failed: {}", e.getMessage());
+            log.error("Operation failed: {}", e.getMessage());
         }
     }
 
@@ -77,12 +90,12 @@ public class CustomerServiceImpl implements CustomerService {
     public List<CustomerDTO> getAllCustomers() {
         List<CustomerDTO> list = new ArrayList<>();
         try {
-            for (Customer c : customerRepository.findAll()) {
+            for (Customer c : customerRepository.findByActiveTrue()) {
                 list.add(toDTO(c));
             }
-            log.info("All customers retrieved successfully from the database");
+            log.info("Successfully retrieve all customers from database");
         } catch (Exception e) {
-            log.error("Couldn't retrieve customers from the database", e.getMessage());
+            log.error("Operation failed: {}", e.getMessage());
         }
         return list;
     }
@@ -92,13 +105,41 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             Optional<Customer> optional = customerRepository.findById(id);
             if (optional.isPresent()) {
-                log.info("Customer retrieved successfully from the database");
                 return toDTO(optional.get());
             }
         } catch (Exception e) {
-            log.error("Couldn't retrieve customer from the database: {}", e.getMessage());
+            log.error("Operation failed: {}", e.getMessage());
         }
         return null;
+    }
+
+    @Override
+    public void restoreCustomer(Long id) {
+        Optional<Customer> optional = customerRepository.findById(id);
+        if (optional.isEmpty()) {
+            throw new BusinessException("Customer not found", HttpStatus.NOT_FOUND);
+        }
+        if (optional.get().isActive()) {
+            throw new  BusinessException("Customer is already active", HttpStatus.BAD_REQUEST);
+        }
+        Customer customer = optional.get();
+        customer.setActive(true);
+        customerRepository.save(customer);
+        log.info("Customer restored");
+    }
+
+    @Override
+    public List<CustomerDTO> getInactiveCustomers() {
+        List<CustomerDTO> list = new ArrayList<>();
+        try {
+            for (Customer c : customerRepository.findByActiveFalse()) {
+                list.add(toDTO(c));
+            }
+            log.info("Successfully retrieve inactive customers from database");
+        } catch (Exception e) {
+            log.error("Operation failed: {}", e.getMessage());
+        }
+        return list;
     }
 
     private CustomerDTO toDTO(Customer c) {
