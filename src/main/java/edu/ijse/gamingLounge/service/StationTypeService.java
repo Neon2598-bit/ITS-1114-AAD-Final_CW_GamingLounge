@@ -11,4 +11,6 @@ public interface StationTypeService {
     List<StationTypeDTO> getAllStationTypes();
     StationTypeDTO getStationTypeById(Long id);
     List<StationTypeDTO> getAffordableTypes(Double maxRate);
+    void restoreStationType(Long id);
+    List<StationTypeDTO> getInactiveStationTypes();
 }

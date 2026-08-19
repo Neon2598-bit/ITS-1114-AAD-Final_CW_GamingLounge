@@ -57,10 +57,6 @@ public class StationTypeController {
     @GetMapping("/{id}")
     public ResponseEntity<CommonResponse> getById (@PathVariable Long id) {
         StationTypeDTO dto = stationTypeService.getStationTypeById(id);
-        if (dto == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonResponse(ResponseCode.NOT_FOUND, dto, ResponseMessage.NOT_FOUND));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, dto, ResponseMessage.SUCCESS));
     }
@@ -77,5 +73,23 @@ public class StationTypeController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, stationTypeDTOList, ResponseMessage.SUCCESS));
+    }
+
+    @GetMapping("/inactive")
+    public ResponseEntity<CommonResponse> getInactive() {
+        List<StationTypeDTO> list = stationTypeService.getInactiveStationTypes();
+        if (list.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new CommonResponse(ResponseCode.NOT_FOUND, list, ResponseMessage.NOT_FOUND));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
+    }
+
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<CommonResponse> restore(@PathVariable Long id) {
+        stationTypeService.restoreStationType(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
     }
 }
