@@ -117,3 +117,20 @@ function loadCrud(key) {
         renderTable(key, response.body);
     });
 }
+
+function actionBtns(key, row) {
+    return '<button class="secondary" onclick="crudEdit(\'' + key + '\', ' + row.id + ')">Edit</button>' +
+           '<button class="danger" onclick="crudDelete(\'' + key + '\', ' + row.id + ')">Delete</button>';
+}
+
+function renderTable(key, rows) {
+    const body = $('#' + key + '-body');
+    ROW_CACHE[key] = {};
+    (rows || []).forEach(function (r) { ROW_CACHE[key][r.id] = r; });
+
+    if (!rows || rows.length === 0) {
+        body.html('<tr><td colspan="8" style="color:var(--text-dim)">No records yet.</td></tr>');
+        return;
+    }
+    body.html(ROW_RENDERERS[key](rows));
+}
