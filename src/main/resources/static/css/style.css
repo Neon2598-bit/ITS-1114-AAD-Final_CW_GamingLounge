@@ -116,3 +116,14 @@ button.secondary {
     margin-bottom: 16px;
     display: none;
 }
+
+.success-msg {
+    background: rgba(46, 204, 113, 0.12);
+    border: 1px solid var(--success);
+    color: #7ee8a8;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+}
