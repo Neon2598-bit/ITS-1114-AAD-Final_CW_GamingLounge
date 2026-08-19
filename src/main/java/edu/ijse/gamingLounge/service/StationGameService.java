@@ -10,4 +10,6 @@ public interface StationGameService {
     List<StationGameDTO> getAllStationGames();
     List<StationGameDTO> getGamesByStation(Long stationId);
     List<StationGameDTO> getStationsByGame(Long gameId);
+    void restoreStationGame(Long id);
+    List<StationGameDTO> getInactiveStationGames();
 }

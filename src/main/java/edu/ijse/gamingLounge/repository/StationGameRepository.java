@@ -9,13 +9,15 @@ import java.util.List;
 
 @Repository
 public interface StationGameRepository extends JpaRepository<StationGame, Long> {
-    // Prevents adding the SAME game to the SAME station twice
-    boolean existsByStation_IdAndGame_Id(Long stationId, Long gameId);
 
-    @Query("SELECT sg FROM StationGame sg JOIN FETCH sg.station JOIN FETCH sg.game")
+    @Query("SELECT sg FROM StationGame sg JOIN FETCH sg.station JOIN FETCH sg.game WHERE sg.active = true")
     List<StationGame> findAllWithDetails();
 
-    List<StationGame> findByStation_Id(Long stationId);
+    List<StationGame> findByStation_IdAndActiveTrue(Long stationId);
 
-    List<StationGame> findByGame_Id(Long gameId);
+    List<StationGame> findByGame_IdAndActiveTrue(Long gameId);
+
+    boolean existsByStation_IdAndGame_IdAndActiveTrue(Long stationId, Long gameId);
+
+    List<StationGame> findByActiveFalse();
 }

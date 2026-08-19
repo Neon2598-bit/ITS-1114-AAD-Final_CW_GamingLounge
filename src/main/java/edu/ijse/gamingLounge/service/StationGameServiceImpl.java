@@ -4,11 +4,13 @@ import edu.ijse.gamingLounge.dto.StationGameDTO;
 import edu.ijse.gamingLounge.entity.Game;
 import edu.ijse.gamingLounge.entity.Station;
 import edu.ijse.gamingLounge.entity.StationGame;
+import edu.ijse.gamingLounge.exception.BusinessException;
 import edu.ijse.gamingLounge.repository.GameRepository;
 import edu.ijse.gamingLounge.repository.StationGameRepository;
 import edu.ijse.gamingLounge.repository.StationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,9 +28,9 @@ public class StationGameServiceImpl implements StationGameService {
     @Override
     public void saveStationGame(StationGameDTO dto) {
         try {
-            if (stationGameRepository.existsByStation_IdAndGame_Id(dto.getStationId(), dto.getGameId())) {
+            if (stationGameRepository.existsByStation_IdAndGame_IdAndActiveTrue(dto.getStationId(), dto.getGameId())) {
                 log.error("This game is already linked to this station");
-                throw new edu.ijse.gamingLounge.exception.BusinessException(
+                throw new BusinessException(
                         "This game is already linked to this station.");
             }
 
@@ -37,7 +39,11 @@ public class StationGameServiceImpl implements StationGameService {
 
             if (stationOptional.isEmpty() || gameOptional.isEmpty()) {
                 log.error("Station or Game not found");
-                throw new edu.ijse.gamingLounge.exception.BusinessException("Station or game not found.");
+                throw new BusinessException("Station or game not found.", HttpStatus.NOT_FOUND);
+            }
+
+            if (!stationOptional.get().isActive() || !gameOptional.get().isActive()) {
+                throw new BusinessException("Station or Game not in active state.");
             }
 
             StationGame stationGame = new StationGame();
@@ -53,13 +59,16 @@ public class StationGameServiceImpl implements StationGameService {
 
     @Override
     public void deleteStationGame(Long id) {
-        if (!stationGameRepository.existsById(id)) {
-            log.error("Station-game link not found: {}", id);
-            throw new edu.ijse.gamingLounge.exception.BusinessException(
-                    "Station-game link not found.", org.springframework.http.HttpStatus.NOT_FOUND);
-        }
-        stationGameRepository.deleteById(id);
-        log.info("Specific station game deleted successfully");
+            Optional<StationGame> optional = stationGameRepository.findById(id);
+            if (optional.isPresent() && optional.get().isActive()) {
+                StationGame stationGame = optional.get();
+                stationGame.setActive(false);
+                stationGameRepository.save(stationGame);
+                log.info("Station game link marked as inactive");
+            } else {
+                log.error("Station game not found");
+                throw new BusinessException("Station game not found", HttpStatus.NOT_FOUND);
+            }
     }
 
     @Override
@@ -80,7 +89,7 @@ public class StationGameServiceImpl implements StationGameService {
     public List<StationGameDTO> getGamesByStation(Long stationId) {
         List<StationGameDTO> list = new ArrayList<>();
         try {
-            for (StationGame sg : stationGameRepository.findByStation_Id(stationId)) {
+            for (StationGame sg : stationGameRepository.findByStation_IdAndActiveTrue(stationId)) {
                 list.add(toDTO(sg));
             }
             log.info("All Games retrieved according to the specific station");
@@ -94,12 +103,44 @@ public class StationGameServiceImpl implements StationGameService {
     public List<StationGameDTO> getStationsByGame(Long gameId) {
         List<StationGameDTO> list = new ArrayList<>();
         try {
-            for (StationGame sg : stationGameRepository.findByGame_Id(gameId)) {
+            for (StationGame sg : stationGameRepository.findByGame_IdAndActiveTrue(gameId)) {
                 list.add(toDTO(sg));
             }
             log.info("All stations retrieved according to the specific game");
         } catch (Exception e) {
             log.error("Operation failed: {}", e.getMessage());
+        }
+        return list;
+    }
+
+    @Override
+    public void restoreStationGame(Long id) {
+        Optional<StationGame> stationGameOptional = stationGameRepository.findById(id);
+
+        if (stationGameOptional.isEmpty()) {
+            throw new BusinessException("Station game not found", HttpStatus.NOT_FOUND);
+        }
+
+        if (stationGameOptional.get().isActive()) {
+            throw new BusinessException("Station game is already active.", HttpStatus.CONFLICT);
+        }
+        StationGame stationGame = stationGameOptional.get();
+        stationGame.setActive(true);
+        stationGameRepository.save(stationGame);
+        log.info("Station game link restored");
+
+    }
+
+    @Override
+    public List<StationGameDTO> getInactiveStationGames() {
+        List<StationGameDTO> list = new ArrayList<>();
+        try {
+            for (StationGame sg : stationGameRepository.findByActiveFalse()) {
+                list.add(toDTO(sg));
+            }
+            log.info("Inactive station games retrieved successfully");
+        } catch (Exception e) {
+            log.error("Couldn't retrieve inactive station games", e.getMessage());
         }
         return list;
     }
