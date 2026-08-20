@@ -11,19 +11,22 @@ $('#welcomeText').text("Hi, " + getUserName());
 const CRUD = {
     branch:         { endpoint: "/branch",          fields: ["branchName", "address", "contactNumber"] },
     stationType:   { endpoint: "/station-type",    fields: ["typeName", "hourlyRate"] },
-    station:       { endpoint: "/station",         fields: ["stationCode", "branchId", "stationTypeId", "status"] }
+    station:       { endpoint: "/station",         fields: ["stationCode", "branchId", "stationTypeId", "status"] },
+    game:          { endpoint: "/game",            fields: ["gameName", "genre", "ageRating"] }
 };
 
 const CRUD_LABEL = {
     branch: "Branches",
     stationType: "Station Types",
-    station: "Stations"
+    station: "Stations",
+    game: "Games"
 };
 
 const SECTIONS = [
     { key: "branch", label: "Branches" },
     { key: "stationType", label: "Station Types" },
-    { key: "station", label: "Stations" }
+    { key: "station", label: "Stations" },
+    { key: "game", label: "Games" }
 ];
 
 const ROW_CACHE = {};
@@ -217,6 +220,14 @@ ROW_RENDERERS.station = function (rows) {
 };
 INACTIVE_ROW_RENDERERS.station = function (rows) {
     return rows.map(r => '<tr><td>' + r.stationCode + '</td><td>' + r.branchName + '</td><td>' + r.typeName + '</td><td>Rs. ' + r.hourlyRate + '</td><td>' + r.status + '</td><td>' + restoreBtn('station', r) + '</td></tr>').join('');
+};
+
+// ---- GAME ---------------------------------------------------------------
+ROW_RENDERERS.game = function (rows) {
+    return rows.map(r => '<tr><td>' + r.gameName + '</td><td>' + r.genre + '</td><td>' + r.ageRating + '</td><td>' + actionBtns('game', r) + '</td></tr>').join('');
+};
+INACTIVE_ROW_RENDERERS.game = function (rows) {
+    return rows.map(r => '<tr><td>' + r.gameName + '</td><td>' + r.genre + '</td><td>' + r.ageRating + '</td><td>' + restoreBtn('game', r) + '</td></tr>').join('');
 };
 
 function loadStationDropdownsThenTable() {

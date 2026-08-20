@@ -102,6 +102,36 @@
                 <tbody id="station-inactive-body"></tbody>
             </table>
         </div>
+
+        <div class="section" data-section="game">
+            <h2>Games</h2>
+            <div class="error-msg" id="game-error"></div>
+            <div class="success-msg" id="game-success"></div>
+            <div class="card" style="max-width:100%; margin-bottom:20px;">
+                <div class="form-grid">
+                    <div class="field"><label>Game Name</label><input id="game-gameName"></div>
+                    <div class="field"><label>Genre</label><input id="game-genre"></div>
+                    <div class="field"><label>Age Rating</label>
+                        <select id="game-ageRating">
+                            <option value="T">T - Teen</option>
+                            <option value="A">A - Adult</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button onclick="crudSave('game')">Save</button>
+                    <button class="secondary" onclick="crudResetForm('game')">Clear</button>
+                </div>
+            </div>
+            <table><thead><tr><th>Name</th><th>Genre</th><th>Age Rating</th><th>Actions</th></tr></thead>
+                <tbody id="game-body"></tbody></table>
+
+            <button class="secondary" style="margin-top:16px" onclick="toggleInactive('game')" id="game-inactive-toggle">Show Deleted Games</button>
+            <table id="game-inactive-table" style="display:none; margin-top:10px">
+                <thead><tr><th>Name</th><th>Genre</th><th>Age Rating</th><th>Actions</th></tr></thead>
+                <tbody id="game-inactive-body"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
