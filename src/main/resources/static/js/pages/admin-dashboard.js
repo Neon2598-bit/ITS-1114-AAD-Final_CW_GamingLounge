@@ -284,9 +284,9 @@ function deleteStationGame(id) {
 
     $.ajax({
         url: API_BASE + "/station-game/" + id,
-        type: "DELETE"
+        type: "DELETE",
         success: function () { loadStationGameSection(); },
-        error: function () { showCrudError('stationGame',xhr); }
+        error: function () { showCrudError('stationGame', xhr); }
     });
 }
 
@@ -315,7 +315,7 @@ function loadInactiveStationGames() {
 
 function restoreStationGame(id) {
     $.ajax({
-        utl: API_BASE + "/station-game/" + id + "/restore",
+        url: API_BASE + "/station-game/" + id + "/restore",
         type: "PUT",
         success: function () {
             showCrudSuccess('stationGame', "Restored.");
@@ -334,3 +334,4 @@ Object.keys(CRUD).forEach(function (key) {
 });
 
 loadStationDropdownsThenTable();
+loadStationGameSection();

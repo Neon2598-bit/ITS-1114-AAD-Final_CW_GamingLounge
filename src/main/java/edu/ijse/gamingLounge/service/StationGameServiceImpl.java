@@ -27,7 +27,6 @@ public class StationGameServiceImpl implements StationGameService {
 
     @Override
     public void saveStationGame(StationGameDTO dto) {
-        try {
             if (stationGameRepository.existsByStation_IdAndGame_IdAndActiveTrue(dto.getStationId(), dto.getGameId())) {
                 log.error("This game is already linked to this station");
                 throw new BusinessException(
@@ -51,10 +50,6 @@ public class StationGameServiceImpl implements StationGameService {
             stationGame.setGame(gameOptional.get());
             stationGameRepository.save(stationGame);
             log.info("This station game saved successfully to database");
-
-        } catch (Exception e) {
-            log.error("Saving has been failed", e.getMessage());
-        }
     }
 
     @Override

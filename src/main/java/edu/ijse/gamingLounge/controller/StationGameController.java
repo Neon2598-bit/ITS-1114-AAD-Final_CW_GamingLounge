@@ -38,10 +38,6 @@ public class StationGameController {
     @GetMapping
     public ResponseEntity<CommonResponse> getAll() {
         List<StationGameDTO> list = stationGameService.getAllStationGames();
-        if (list.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonResponse(ResponseCode.NOT_FOUND, ResponseMessage.NOT_FOUND));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }
@@ -50,10 +46,6 @@ public class StationGameController {
     @GetMapping("/by-station/{stationId}")
     public ResponseEntity<CommonResponse> getByStation(@PathVariable Long stationId) {
         List<StationGameDTO> list = stationGameService.getGamesByStation(stationId);
-        if (list.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonResponse(ResponseCode.NOT_FOUND, ResponseMessage.NOT_FOUND));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }
@@ -62,10 +54,6 @@ public class StationGameController {
     @GetMapping("/by-game/{gameId}")
     public ResponseEntity<CommonResponse> getByGame (@PathVariable Long gameId) {
         List<StationGameDTO> list = stationGameService.getStationsByGame(gameId);
-        if (list.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonResponse(ResponseCode.NOT_FOUND, ResponseMessage.NOT_FOUND));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }
@@ -73,10 +61,6 @@ public class StationGameController {
     @GetMapping("/inactive")
     public ResponseEntity<CommonResponse> getInactiveStationGames() {
         List<StationGameDTO> list = stationGameService.getInactiveStationGames();
-        if (list.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonResponse(ResponseCode.NOT_FOUND, ResponseMessage.NOT_FOUND));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }
