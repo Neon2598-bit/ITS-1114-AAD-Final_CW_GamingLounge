@@ -290,6 +290,29 @@ function deleteStationGame(id) {
     });
 }
 
+let stationGameInactiveVisible = false;
+
+function toggleStationGameInactive() {
+    stationGameInactiveVisible = !stationGameInactiveVisible;
+    $('#stationGame-inactive-table').toggle(stationGameInactiveVisible);
+    $('#stationGame-inactive-toggle').text(stationGameInactiveVisible ? 'Hide Removed Links' : 'Show Removed Links');
+    if (stationGameInactiveVisible) loadInactiveStationGames();
+}
+
+function loadInactiveStationGames() {
+    $.get(API_BASE + "/station-game/inactive", function (response) {
+        const rows = response.body;
+        if (!rows || rows.length === 0) {
+            $('#stationGame-inactive-body').html('<tr><td colspan="3" style="color:var(--text-dim)">No removed links.</td></tr>');
+            return;
+        }
+        $('#stationGame-inactive-body').html(rows.map(r =>
+            '<tr><td>' + r.stationCode + '</td><td>' + r.gameName + '</td><td>' +
+            '<button class="secondary" onclick="restoreStationGame(' + r.id + ')">Restore</button></td></tr>'
+        ).join(''));
+    });
+}
+
 // =============================================================================
 // PAGE INIT - load every simple CRUD table, plus the special screens
 // =============================================================================
