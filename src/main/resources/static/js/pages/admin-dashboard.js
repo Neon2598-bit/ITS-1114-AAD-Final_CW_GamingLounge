@@ -313,6 +313,19 @@ function loadInactiveStationGames() {
     });
 }
 
+function restoreStationGame(id) {
+    $.ajax({
+        utl: API_BASE + "/station-game/" + id + "/restore",
+        type: "PUT",
+        success: function () {
+            showCrudSuccess('stationGame', "Restored.");
+            loadStationGameSection();
+            loadInactiveStationGames();
+        },
+        error: function (xhr) { showCrudError('stationGame', xhr); }
+    });
+}
+
 // =============================================================================
 // PAGE INIT - load every simple CRUD table, plus the special screens
 // =============================================================================
