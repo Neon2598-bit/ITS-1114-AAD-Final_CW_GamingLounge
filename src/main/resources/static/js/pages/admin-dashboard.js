@@ -279,6 +279,17 @@ function addStationGame() {
     });
 }
 
+function deleteStationGame(id) {
+    if (!confirm("Remove this game from the station ? ")) return;
+
+    $.ajax({
+        url: API_BASE + "/station-game/" + id,
+        type: "DELETE"
+        success: function () { loadStationGameSection(); },
+        error: function () { showCrudError('stationGame',xhr); }
+    });
+}
+
 // =============================================================================
 // PAGE INIT - load every simple CRUD table, plus the special screens
 // =============================================================================
