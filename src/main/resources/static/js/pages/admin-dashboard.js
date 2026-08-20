@@ -26,7 +26,8 @@ const SECTIONS = [
     { key: "branch", label: "Branches" },
     { key: "stationType", label: "Station Types" },
     { key: "station", label: "Stations" },
-    { key: "game", label: "Games" }
+    { key: "game", label: "Games" },
+    { key: "stationGame", label: "Station-Game Links" }
 ];
 
 const ROW_CACHE = {};
@@ -242,6 +243,39 @@ function fillSelect(selector, endpoint, valueField, labelFn) {
             return '<option value="' + r[valueField] + '">' + labelFn(r) + '</option>';
         });
         $(selector).html(options.join(''));
+    });
+}
+
+// ---- STATION-GAME LINKS ---------------------------------------------------
+
+function loadStationGameSection() {
+    fillSelect('#stationGame-stationId', '/station', 'id', r => r.stationCode);
+    fillSelect('#stationGame-gameId', '/game', 'id', r => r.gameName);
+    $.get(API_BASE + "/station-game", function (response) {
+        const rows = response.body;
+        if (rows.length === 0) {
+            $('#stationGame-body').html('<tr><td colspan="3" style="color:var(--text-dim)">No links yet.</td></tr>');
+            return;
+        }
+        $('#stationGame-body').html(rows.map(r =>
+            '<tr><td>' + r.stationCode + '</td><td>' + r.gameName + '</td><td>' +
+            '<button class="danger" onclick="deleteStationGame(' + r.id + ')">Remove</button></td></tr>'
+        ).join(''));
+    });
+}
+
+function addStationGame() {
+    const dto = {
+        stationId: $('#stationGame-stationId').val(),
+        gameId: $('#stationGame-gameId').val()
+    };
+    $.ajax({
+        url: API_BASE + "/station-game",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(dto),
+        success: function () { showCrudSuccess('stationGame', "Game linked to station."); loadStationGameSection(); },
+        error: function (xhr) { showCrudError('stationGame', xhr); }
     });
 }
 

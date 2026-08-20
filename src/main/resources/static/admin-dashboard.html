@@ -132,6 +132,32 @@
                 <tbody id="game-inactive-body"></tbody>
             </table>
         </div>
+
+        <div class="section" data-section="stationGame">
+            <h2>Station &harr; Game Links</h2>
+            <p style="color:var(--text-dim); font-size:13px; margin-top:-8px;">
+                Assign which games are installed on which station. A link can only be added or removed - to change it, delete and re-add.
+            </p>
+            <div class="error-msg" id="stationGame-error"></div>
+            <div class="success-msg" id="stationGame-success"></div>
+            <div class="card" style="max-width:100%; margin-bottom:20px;">
+                <div class="form-grid">
+                    <div class="field"><label>Station</label><select id="stationGame-stationId"></select></div>
+                    <div class="field"><label>Game</label><select id="stationGame-gameId"></select></div>
+                </div>
+                <div class="form-actions">
+                    <button onclick="addStationGame()">Link Game to Station</button>
+                </div>
+            </div>
+            <table><thead><tr><th>Station</th><th>Game</th><th>Actions</th></tr></thead>
+                <tbody id="stationGame-body"></tbody></table>
+
+            <button class="secondary" style="margin-top:16px" onclick="toggleStationGameInactive()" id="stationGame-inactive-toggle">Show Removed Links</button>
+            <table id="stationGame-inactive-table" style="display:none; margin-top:10px">
+                <thead><tr><th>Station</th><th>Game</th><th>Actions</th></tr></thead>
+                <tbody id="stationGame-inactive-body"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
