@@ -9,15 +9,18 @@ $('#welcomeText').text("Hi, " + getUserName());
 // 2. CORE ENGINE
 // =============================================================================
 const CRUD = {
-    branch:         { endpoint: "/branch",          fields: ["branchName", "address", "contactNumber"] }
+    branch:         { endpoint: "/branch",          fields: ["branchName", "address", "contactNumber"] },
+    stationType:   { endpoint: "/station-type",    fields: ["typeName", "hourlyRate"] }
 };
 
 const CRUD_LABEL = {
-    branch: "Branches"
+    branch: "Branches",
+    stationType: "Station Types"
 };
 
 const SECTIONS = [
-    { key: "branch", label: "Branches" }
+    { key: "branch", label: "Branches" },
+    { key: "stationType", label: "Station Types" }
 ];
 
 const ROW_CACHE = {};
@@ -36,6 +39,10 @@ function showSection(key) {
     $('.sidebar button').removeClass('active');
     $('.sidebar button[data-key="' + key + '"]').addClass('active');
 }
+
+$('#sidebarNav').html(SECTIONS.map(function (s, i) {
+    return '<button data-key="' + s.key + '" class="' + (i === 0 ? 'active' : '') + '" onclick="showSection(\'' + s.key + '\')">' + s.label + '</button>';
+}).join(''));
 
 function showCrudError(key, xhr) {
     let text = "Something went wrong. Please try again.";
@@ -190,6 +197,14 @@ ROW_RENDERERS.branch = function (rows) {
 };
 INACTIVE_ROW_RENDERERS.branch = function (rows) {
     return rows.map(r => '<tr><td>' + r.branchName + '</td><td>' + r.address + '</td><td>' + r.contactNumber + '</td><td>' + restoreBtn('branch', r) + '</td></tr>').join('');
+};
+
+// ---- STATION TYPE ----------------------------------------------------------
+ROW_RENDERERS.stationType = function (rows) {
+    return rows.map(r => '<tr><td>' + r.typeName + '</td><td>Rs. ' + r.hourlyRate + '</td><td>' + actionBtns('stationType', r) + '</td></tr>').join('');
+};
+INACTIVE_ROW_RENDERERS.stationType = function (rows) {
+    return rows.map(r => '<tr><td>' + r.typeName + '</td><td>Rs. ' + r.hourlyRate + '</td><td>' + restoreBtn('stationType', r) + '</td></tr>').join('');
 };
 
 // =============================================================================
