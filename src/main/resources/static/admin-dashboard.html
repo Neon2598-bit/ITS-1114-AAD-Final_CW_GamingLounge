@@ -158,6 +158,29 @@
                 <tbody id="stationGame-inactive-body"></tbody>
             </table>
         </div>
+
+        <div class="section" data-section="snackCategory">
+            <h2>Snack Categories</h2>
+            <div class="error-msg" id="snackCategory-error"></div>
+            <div class="success-msg" id="snackCategory-success"></div>
+            <div class="card" style="max-width:100%; margin-bottom:20px;">
+                <div class="form-grid">
+                    <div class="field"><label>Category Name</label><input id="snackCategory-categoryName" placeholder="Drinks, Snacks, Combos"></div>
+                </div>
+                <div class="form-actions">
+                    <button onclick="crudSave('snackCategory')">Save</button>
+                    <button class="secondary" onclick="crudResetForm('snackCategory')">Clear</button>
+                </div>
+            </div>
+            <table><thead><tr><th>Category</th><th>Actions</th></tr></thead>
+                <tbody id="snackCategory-body"></tbody></table>
+            
+            <button class="secondary" style="margin-top:16px" onclick="toggleInactive('snackCategory')" id="snackCategory-inactive-toggle">Show Deleted Snack Categories</button>
+            <table id="snackCategory-inactive-table" style="display:none; margin-top:10px">
+                <thead><tr><th>Category</th><th>Actions</th></tr></thead>
+                <tbody id="snackCategory-inactive-body"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
