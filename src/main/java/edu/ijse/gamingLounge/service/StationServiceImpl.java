@@ -1,5 +1,6 @@
 package edu.ijse.gamingLounge.service;
 
+import edu.ijse.gamingLounge.constant.ResponseCode;
 import edu.ijse.gamingLounge.dto.StationDTO;
 import edu.ijse.gamingLounge.entity.Branch;
 import edu.ijse.gamingLounge.entity.Station;
@@ -40,6 +41,11 @@ public class StationServiceImpl implements StationService {
         }
 
         Station station = new Station();
+
+        if (stationRepository.existsByStationCode(dto.getStationCode())) {
+            throw new BusinessException("Station code already exists.", HttpStatus.CONFLICT);
+        }
+
         station.setStationCode(dto.getStationCode());
         station.setStatus(StationStatus.valueOf(dto.getStatus()));
         station.setBranch(branchOptional.get());

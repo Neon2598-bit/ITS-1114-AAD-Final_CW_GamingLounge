@@ -70,6 +70,38 @@
                 <tbody id="stationType-inactive-body"></tbody>
             </table>
         </div>
+
+        <div class="section" data-section="station">
+            <h2>Stations</h2>
+            <div class="error-msg" id="station-error"></div>
+            <div class="success-msg" id="station-success"></div>
+            <div class="card" style="max-width:100%; margin-bottom:20px;">
+                <div class="form-grid">
+                    <div class="field"><label>Station Code</label><input id="station-stationCode" placeholder="PS-01"></div>
+                    <div class="field"><label>Branch</label><select id="station-branchId"></select></div>
+                    <div class="field"><label>Station Type</label><select id="station-stationTypeId"></select></div>
+                    <div class="field"><label>Status</label>
+                        <select id="station-status">
+                            <option value="AVAILABLE">AVAILABLE</option>
+                            <option value="OCCUPIED">OCCUPIED</option>
+                            <option value="MAINTENANCE">MAINTENANCE</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button onclick="crudSave('station')">Save</button>
+                    <button class="secondary" onclick="crudResetForm('station')">Clear</button>
+                </div>
+            </div>
+            <table><thead><tr><th>Code</th><th>Branch</th><th>Type</th><th>Rate / hr</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="station-body"></tbody></table>
+
+            <button class="secondary" style="margin-top:16px" onclick="toggleInactive('station')" id="station-inactive-toggle">Show Deleted Stations</button>
+            <table id="station-inactive-table" style="display:none; margin-top:10px">
+                <thead><tr><th>Code</th><th>Branch</th><th>Type</th><th>Rate / hr</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="station-inactive-body"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 

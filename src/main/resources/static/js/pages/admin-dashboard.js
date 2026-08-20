@@ -10,17 +10,20 @@ $('#welcomeText').text("Hi, " + getUserName());
 // =============================================================================
 const CRUD = {
     branch:         { endpoint: "/branch",          fields: ["branchName", "address", "contactNumber"] },
-    stationType:   { endpoint: "/station-type",    fields: ["typeName", "hourlyRate"] }
+    stationType:   { endpoint: "/station-type",    fields: ["typeName", "hourlyRate"] },
+    station:       { endpoint: "/station",         fields: ["stationCode", "branchId", "stationTypeId", "status"] }
 };
 
 const CRUD_LABEL = {
     branch: "Branches",
-    stationType: "Station Types"
+    stationType: "Station Types",
+    station: "Stations"
 };
 
 const SECTIONS = [
     { key: "branch", label: "Branches" },
-    { key: "stationType", label: "Station Types" }
+    { key: "stationType", label: "Station Types" },
+    { key: "station", label: "Stations" }
 ];
 
 const ROW_CACHE = {};
@@ -207,9 +210,35 @@ INACTIVE_ROW_RENDERERS.stationType = function (rows) {
     return rows.map(r => '<tr><td>' + r.typeName + '</td><td>Rs. ' + r.hourlyRate + '</td><td>' + restoreBtn('stationType', r) + '</td></tr>').join('');
 };
 
+// ---- STATION --------------------------------------------------------------
+
+ROW_RENDERERS.station = function (rows) {
+    return rows.map(r => '<tr><td>' + r.stationCode + '</td><td>' + r.branchName + '</td><td>' + r.typeName + '</td><td>Rs. ' + r.hourlyRate + '</td><td>' + r.status + '</td><td>' + actionBtns('station', r) + '</td></tr>').join('');
+};
+INACTIVE_ROW_RENDERERS.station = function (rows) {
+    return rows.map(r => '<tr><td>' + r.stationCode + '</td><td>' + r.branchName + '</td><td>' + r.typeName + '</td><td>Rs. ' + r.hourlyRate + '</td><td>' + r.status + '</td><td>' + restoreBtn('station', r) + '</td></tr>').join('');
+};
+
+function loadStationDropdownsThenTable() {
+    fillSelect('#station-branchId', '/branch', 'id', r => r.branchName);
+    fillSelect('#station-stationTypeId', '/station-type', 'id', r => r.typeName + ' (Rs. ' + r.hourlyRate + '/hr)')
+        .then(function () { loadCrud('station'); });
+}
+
+function fillSelect(selector, endpoint, valueField, labelFn) {
+    return $.get(API_BASE + endpoint, function (response) {
+        const options = response.body.map(function (r) {
+            return '<option value="' + r[valueField] + '">' + labelFn(r) + '</option>';
+        });
+        $(selector).html(options.join(''));
+    });
+}
+
 // =============================================================================
 // PAGE INIT - load every simple CRUD table, plus the special screens
 // =============================================================================
 Object.keys(CRUD).forEach(function (key) {
     if (key !== 'station' && key !== 'snack') loadCrud(key);
 });
+
+loadStationDropdownsThenTable();

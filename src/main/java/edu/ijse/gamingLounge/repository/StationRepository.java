@@ -15,4 +15,6 @@ public interface StationRepository extends JpaRepository<Station, Long> {
 
     List<Station> findByBranch_IdAndStatusAndActiveTrue(Long branchId, StationStatus status);
     List<Station> findByActiveFalse();
+
+    boolean existsByStationCode(String stationCode);
 }
