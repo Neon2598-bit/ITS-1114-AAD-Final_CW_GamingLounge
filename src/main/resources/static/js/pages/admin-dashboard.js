@@ -39,7 +39,8 @@ const SECTIONS = [
     { key: "snackCategory", label: "Snack Categories" },
     { key: "snack", label: "Snacks" },
     { key: "membershipPlan", label: "Membership Plans" },
-    { key: "customer", label: "Customers" }
+    { key: "customer", label: "Customers" },
+    { key: "booking", label: "Bookings" }
 ];
 
 const ROW_CACHE = {};
@@ -378,6 +379,40 @@ function restoreStationGame(id) {
 }
 
 // =============================================================================
+// BOOKINGS
+// =============================================================================
+const BOOKING_STATUSES = ["BOOKED", "ONGOING", "COMPLETED", "CANCELLED"];
+
+function loadBookings() {
+    $.get(API_BASE + "/booking", function (response) {
+        const rows = response.body;
+        if (rows.length === 0) {
+            $('#booking-body').html('<tr><td colspan="7" style="color:var(--text-dim)">No bookings yet.</td></tr>');
+            return;
+        }
+        $('#booking-body').html(rows.map(function (b) {
+            const options = BOOKING_STATUSES.map(s =>
+                '<option value="' + s + '"' + (s === b.status ? ' selected' : '') + '>' + s + '</option>').join('');
+            return '<tr><td>' + b.customerName + '</td><td>' + b.stationCode + '</td><td>' +
+                    formatDate(b.startTime) + '</td><td>' + formatDate(b.endTime) + '</td><td>Rs. ' +
+                    b.totalAmount + '</td><td>' + b.status + '</td><td>' +
+                    '<select id="booking-status-' + b.id + '" style="width:auto; padding:4px 6px; display:inline-block">' + options + '</select> ' +
+                    '<button style="width:auto; padding:6px 10px" onclick="updateBookingStatus(' + b.id + ')">Update</button></td></tr>';
+        }).join(''));
+    });
+}
+
+function updateBookingStatus(id) {
+    const status = $('#booking-status-' + id).val();
+    $.ajax({
+        url: API_BASE + "/booking/" + id + "/status?status=" + status,
+        type: "PATCH",
+        success: function () { showCrudSuccess('booking', "Booking status updated."); loadBookings(); },
+        error: function (xhr) { showCrudError('booking', xhr); }
+    });
+}
+
+// =============================================================================
 // PAGE INIT - load every simple CRUD table, plus the special screens
 // =============================================================================
 Object.keys(CRUD).forEach(function (key) {
@@ -387,3 +422,4 @@ Object.keys(CRUD).forEach(function (key) {
 loadStationDropdownsThenTable();
 loadStationGameSection();
 loadSnackDropdownsThenTable();
+loadBookings();
