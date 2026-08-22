@@ -233,6 +233,24 @@
                 <tbody id="membershipPlan-inactive-body"></tbody>
             </table>
         </div>
+
+        <div class="section" data-section="customer">
+            <h2>Customers</h2>
+            <p style="color:var(--text-dim); font-size:13px; margin-top:-8px;">
+                Customers register themselves through the public sign-up flow - admin can
+                only review, deactivate, and restore accounts here, not create or edit them.
+            </p>
+            <div class="error-msg" id="customer-error"></div>
+            <div class="success-msg" id="customer-success"></div>
+            <table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Actions</th></tr></thead>
+                <tbody id="customer-body"></tbody></table>
+
+            <button class="secondary" style="margin-top:16px" onclick="toggleInactive('customer')" id="customer-inactive-toggle">Show Deleted Customers</button>
+            <table id="customer-inactive-table" style="display:none; margin-top:10px">
+                <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Actions</th></tr></thead>
+                <tbody id="customer-inactive-body"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 

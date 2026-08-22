@@ -15,7 +15,8 @@ const CRUD = {
     game:          { endpoint: "/game",            fields: ["gameName", "genre", "ageRating"] },
     snackCategory: { endpoint: "/snack-category",  fields: ["categoryName"] },
     snack:         { endpoint: "/snack",           fields: ["name", "snackCategoryId", "price", "stockQty"] },
-    membershipPlan:{ endpoint: "/membership-plan", fields: ["planName", "price", "durationDays", "discountPercentage"] }
+    membershipPlan:{ endpoint: "/membership-plan", fields: ["planName", "price", "durationDays", "discountPercentage"] },
+    customer:      { endpoint: "/customer",        fields: [] }
 };
 
 const CRUD_LABEL = {
@@ -25,7 +26,8 @@ const CRUD_LABEL = {
     game: "Games",
     snackCategory: "Snack Categories",
     snack: "Snacks",
-    membershipPlan: "Membership Plans"
+    membershipPlan: "Membership Plans",
+    customer: "Customers"
 };
 
 const SECTIONS = [
@@ -36,7 +38,8 @@ const SECTIONS = [
     { key: "stationGame", label: "Station-Game Links" },
     { key: "snackCategory", label: "Snack Categories" },
     { key: "snack", label: "Snacks" },
-    { key: "membershipPlan", label: "Membership Plans" }
+    { key: "membershipPlan", label: "Membership Plans" },
+    { key: "customer", label: "Customers" }
 ];
 
 const ROW_CACHE = {};
@@ -262,6 +265,16 @@ ROW_RENDERERS.membershipPlan = function (rows) {
 };
 INACTIVE_ROW_RENDERERS.membershipPlan = function (rows) {
     return rows.map(r => '<tr><td>' + r.planName + '</td><td>Rs. ' + r.price + '</td><td>' + r.durationDays + ' days</td><td>' + r.discountPercentage + '%</td><td>' + restoreBtn('membershipPlan', r) + '</td></tr>').join('');
+};
+
+// ---- CUSTOMER --------------------------------------------------------
+
+ROW_RENDERERS.customer = function (rows) {
+    return rows.map(r => '<tr><td>' + r.name + '</td><td>' + r.email + '</td><td>' + r.phone + '</td><td>' + (r.address || '') + '</td><td>' +
+        '<button class="danger" onclick="crudDelete(\'customer\', ' + r.id + ')">Deactivate</button></td></tr>').join('');
+};
+INACTIVE_ROW_RENDERERS.customer = function (rows) {
+    return rows.map(r => '<tr><td>' + r.name + '</td><td>' + r.email + '</td><td>' + r.phone + '</td><td>' + (r.address || '') + '</td><td>' + restoreBtn('customer', r) + '</td></tr>').join('');
 };
 
 function loadSnackDropdownsThenTable() {
