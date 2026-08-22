@@ -14,7 +14,8 @@ const CRUD = {
     station:       { endpoint: "/station",         fields: ["stationCode", "branchId", "stationTypeId", "status"] },
     game:          { endpoint: "/game",            fields: ["gameName", "genre", "ageRating"] },
     snackCategory: { endpoint: "/snack-category",  fields: ["categoryName"] },
-    snack:         { endpoint: "/snack",           fields: ["name", "snackCategoryId", "price", "stockQty"] }
+    snack:         { endpoint: "/snack",           fields: ["name", "snackCategoryId", "price", "stockQty"] },
+    membershipPlan:{ endpoint: "/membership-plan", fields: ["planName", "price", "durationDays", "discountPercentage"] }
 };
 
 const CRUD_LABEL = {
@@ -23,7 +24,8 @@ const CRUD_LABEL = {
     station: "Stations",
     game: "Games",
     snackCategory: "Snack Categories",
-    snack: "Snacks"
+    snack: "Snacks",
+    membershipPlan: "Membership Plans"
 };
 
 const SECTIONS = [
@@ -33,7 +35,8 @@ const SECTIONS = [
     { key: "game", label: "Games" },
     { key: "stationGame", label: "Station-Game Links" },
     { key: "snackCategory", label: "Snack Categories" },
-    { key: "snack", label: "Snacks" }
+    { key: "snack", label: "Snacks" },
+    { key: "membershipPlan", label: "Membership Plans" }
 ];
 
 const ROW_CACHE = {};
@@ -251,6 +254,14 @@ ROW_RENDERERS.snack = function (rows) {
 };
 INACTIVE_ROW_RENDERERS.snack = function (rows) {
     return rows.map(r => '<tr><td>' + r.name + '</td><td>' + r.categoryName + '</td><td>Rs. ' + r.price + '</td><td>' + r.stockQty + '</td><td>' + restoreBtn('snack', r) + '</td></tr>').join('');
+};
+
+// ---- MEMBERSHIP PLAN --------------------------------------------------------
+ROW_RENDERERS.membershipPlan = function (rows) {
+    return rows.map(r => '<tr><td>' + r.planName + '</td><td>Rs. ' + r.price + '</td><td>' + r.durationDays + ' days</td><td>' + r.discountPercentage + '%</td><td>' + actionBtns('membershipPlan', r) + '</td></tr>').join('');
+};
+INACTIVE_ROW_RENDERERS.membershipPlan = function (rows) {
+    return rows.map(r => '<tr><td>' + r.planName + '</td><td>Rs. ' + r.price + '</td><td>' + r.durationDays + ' days</td><td>' + r.discountPercentage + '%</td><td>' + restoreBtn('membershipPlan', r) + '</td></tr>').join('');
 };
 
 function loadSnackDropdownsThenTable() {

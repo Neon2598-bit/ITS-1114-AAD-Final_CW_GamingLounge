@@ -45,10 +45,6 @@ public class StationController {
     @GetMapping
     public ResponseEntity<CommonResponse> getAll() {
         List<StationDTO> list = stationService.getAllStations();
-        if (list.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonResponse(ResponseCode.NOT_FOUND, ResponseMessage.NOT_FOUND));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }

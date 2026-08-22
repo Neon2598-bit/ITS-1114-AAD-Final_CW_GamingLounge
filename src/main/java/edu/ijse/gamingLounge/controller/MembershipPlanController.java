@@ -44,10 +44,6 @@ public class MembershipPlanController {
     @GetMapping
     public ResponseEntity<CommonResponse> getAll() {
         List<MembershipPlanDTO> list = membershipPlanService.getAllPlans();
-        if (list.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonResponse(ResponseCode.NOT_FOUND, list, ResponseMessage.NOT_FOUND));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }
@@ -66,10 +62,6 @@ public class MembershipPlanController {
     @GetMapping("/inactive")
     public ResponseEntity<CommonResponse> getInactivePlans() {
         List<MembershipPlanDTO> list = membershipPlanService.getInactivePlans();
-        if (list.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonResponse(ResponseCode.NOT_FOUND, list, ResponseMessage.NOT_FOUND));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }

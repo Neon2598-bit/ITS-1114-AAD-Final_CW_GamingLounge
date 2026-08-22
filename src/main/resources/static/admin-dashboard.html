@@ -207,6 +207,32 @@
                 <tbody id="snack-inactive-body"></tbody>
             </table>
         </div>
+
+        <div class="section" data-section="membershipPlan">
+            <h2>Membership Plans</h2>
+            <div class="error-msg" id="membershipPlan-error"></div>
+            <div class="success-msg" id="membershipPlan-success"></div>
+            <div class="card" style="max-width:100%; margin-bottom:20px;">
+                <div class="form-grid">
+                    <div class="field"><label>Plan Name</label><input id="membershipPlan-planName" placeholder="Gold, Silver"></div>
+                    <div class="field"><label>Price (Rs.)</label><input id="membershipPlan-price" type="number" step="0.01"></div>
+                    <div class="field"><label>Duration (days)</label><input id="membershipPlan-durationDays" type="number"></div>
+                    <div class="field"><label>Discount (%)</label><input id="membershipPlan-discountPercentage" type="number" step="0.01"></div>
+                </div>
+                <div class="form-actions">
+                    <button onclick="crudSave('membershipPlan')">Save</button>
+                    <button class="secondary" onclick="crudResetForm('membershipPlan')">Clear</button>
+                </div>
+            </div>
+            <table><thead><tr><th>Plan</th><th>Price</th><th>Duration</th><th>Discount</th><th>Actions</th></tr></thead>
+                <tbody id="membershipPlan-body"></tbody></table>
+
+            <button class="secondary" style="margin-top:16px" onclick="toggleInactive('membershipPlan')" id="membershipPlan-inactive-toggle">Show Deleted Membership Plans</button>
+            <table id="membershipPlan-inactive-table" style="display:none; margin-top:10px">
+                <thead><tr><th>Plan</th><th>Price</th><th>Duration</th><th>Discount</th><th>Actions</th></tr></thead>
+                <tbody id="membershipPlan-inactive-body"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 

@@ -44,10 +44,6 @@ public class SnackCategoryController {
     @GetMapping
     public ResponseEntity<CommonResponse> getAll() {
         List<SnackCategoryDTO> list = snackCategoryService.getAllCategories();
-        if (list.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonResponse(ResponseCode.NOT_FOUND, ResponseMessage.NOT_FOUND));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }
@@ -62,10 +58,6 @@ public class SnackCategoryController {
     @GetMapping("/inactive")
     public ResponseEntity<CommonResponse> getInactiveCategories() {
         List<SnackCategoryDTO> list = snackCategoryService.getInactiveCategories();
-        if (list.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new CommonResponse(ResponseCode.NOT_FOUND, ResponseMessage.NOT_FOUND));
-        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
     }
