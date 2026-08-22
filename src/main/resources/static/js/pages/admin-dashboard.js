@@ -13,7 +13,8 @@ const CRUD = {
     stationType:   { endpoint: "/station-type",    fields: ["typeName", "hourlyRate"] },
     station:       { endpoint: "/station",         fields: ["stationCode", "branchId", "stationTypeId", "status"] },
     game:          { endpoint: "/game",            fields: ["gameName", "genre", "ageRating"] },
-    snackCategory: { endpoint: "/snack-category",  fields: ["categoryName"] }
+    snackCategory: { endpoint: "/snack-category",  fields: ["categoryName"] },
+    snack:         { endpoint: "/snack",           fields: ["name", "snackCategoryId", "price", "stockQty"] }
 };
 
 const CRUD_LABEL = {
@@ -21,7 +22,8 @@ const CRUD_LABEL = {
     stationType: "Station Types",
     station: "Stations",
     game: "Games",
-    snackCategory: "Snack Categories"
+    snackCategory: "Snack Categories",
+    snack: "Snacks"
 };
 
 const SECTIONS = [
@@ -30,7 +32,8 @@ const SECTIONS = [
     { key: "station", label: "Stations" },
     { key: "game", label: "Games" },
     { key: "stationGame", label: "Station-Game Links" },
-    { key: "snackCategory", label: "Snack Categories" }
+    { key: "snackCategory", label: "Snack Categories" },
+    { key: "snack", label: "Snacks" }
 ];
 
 const ROW_CACHE = {};
@@ -242,6 +245,19 @@ INACTIVE_ROW_RENDERERS.snackCategory = function (rows) {
     return rows.map(r => '<tr><td>' + r.categoryName + '</td><td>' + restoreBtn('snackCategory', r) + '</td></tr>').join('');
 };
 
+// ---- SNACK ------------------------------------------------------------------
+ROW_RENDERERS.snack = function (rows) {
+    return rows.map(r => '<tr><td>' + r.name + '</td><td>' + r.categoryName + '</td><td>Rs. ' + r.price + '</td><td>' + r.stockQty + '</td><td>' + actionBtns('snack', r) + '</td></tr>').join('');
+};
+INACTIVE_ROW_RENDERERS.snack = function (rows) {
+    return rows.map(r => '<tr><td>' + r.name + '</td><td>' + r.categoryName + '</td><td>Rs. ' + r.price + '</td><td>' + r.stockQty + '</td><td>' + restoreBtn('snack', r) + '</td></tr>').join('');
+};
+
+function loadSnackDropdownsThenTable() {
+    fillSelect('#snack-snackCategoryId', '/snack-category', 'id', r => r.categoryName)
+        .then(function () { loadCrud('snack'); });
+}
+
 function loadStationDropdownsThenTable() {
     fillSelect('#station-branchId', '/branch', 'id', r => r.branchName);
     fillSelect('#station-stationTypeId', '/station-type', 'id', r => r.typeName + ' (Rs. ' + r.hourlyRate + '/hr)')
@@ -346,3 +362,4 @@ Object.keys(CRUD).forEach(function (key) {
 
 loadStationDropdownsThenTable();
 loadStationGameSection();
+loadSnackDropdownsThenTable();
