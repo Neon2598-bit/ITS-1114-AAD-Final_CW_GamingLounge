@@ -16,7 +16,8 @@ const CRUD = {
     snackCategory: { endpoint: "/snack-category",  fields: ["categoryName"] },
     snack:         { endpoint: "/snack",           fields: ["name", "snackCategoryId", "price", "stockQty"] },
     membershipPlan:{ endpoint: "/membership-plan", fields: ["planName", "price", "durationDays", "discountPercentage"] },
-    customer:      { endpoint: "/customer",        fields: [] }
+    customer:      { endpoint: "/customer",        fields: [] },
+    employee:      { endpoint: "/employee",        fields: ["name", "email", "phone", "password"] }
 };
 
 const CRUD_LABEL = {
@@ -27,7 +28,8 @@ const CRUD_LABEL = {
     snackCategory: "Snack Categories",
     snack: "Snacks",
     membershipPlan: "Membership Plans",
-    customer: "Customers"
+    customer: "Customers",
+    employee: "Employees"
 };
 
 const SECTIONS = [
@@ -40,7 +42,10 @@ const SECTIONS = [
     { key: "snack", label: "Snacks" },
     { key: "membershipPlan", label: "Membership Plans" },
     { key: "customer", label: "Customers" },
-    { key: "booking", label: "Bookings" }
+    { key: "booking", label: "Bookings" },
+    { key: "employee", label: "Employees" },
+    { key: "feedback", label: "Feedback" },
+    { key: "analytics", label: "Analytics" }
 ];
 
 const ROW_CACHE = {};
@@ -278,6 +283,14 @@ INACTIVE_ROW_RENDERERS.customer = function (rows) {
     return rows.map(r => '<tr><td>' + r.name + '</td><td>' + r.email + '</td><td>' + r.phone + '</td><td>' + (r.address || '') + '</td><td>' + restoreBtn('customer', r) + '</td></tr>').join('');
 };
 
+// ---- EMPLOYEE -----------------------------------------------------------
+ROW_RENDERERS.employee = function (rows) {
+    return rows.map(r => '<tr><td>' + r.name + '</td><td>' + r.email + '</td><td>' + r.phone + '</td><td>' + actionBtns('employee', r) + '</td></tr>').join('');
+};
+INACTIVE_ROW_RENDERERS.employee = function (rows) {
+    return rows.map(r => '<tr><td>' + r.name + '</td><td>' + r.email + '</td><td>' + r.phone + '</td><td>' + restoreBtn('employee', r) + '</td></tr>').join('');
+};
+
 function loadSnackDropdownsThenTable() {
     fillSelect('#snack-snackCategoryId', '/snack-category', 'id', r => r.categoryName)
         .then(function () { loadCrud('snack'); });
@@ -413,6 +426,50 @@ function updateBookingStatus(id) {
 }
 
 // =============================================================================
+// FEEDBACK - read-only view for admin
+// =============================================================================
+function loadFeedback() {
+    $.get(API_BASE + "/feedback", function (response) {
+        const rows = response.body;
+        if (rows.length === 0) {
+            $('#feedback-body').html('<tr><td colspan="5" style="color:var(--text-dim)">No feedback submitted yet.</td></tr>');
+        } else {
+            $('#feedback-body').html(rows.map(function (f) {
+                const stars = '★'.repeat(f.rating) + '☆'.repeat(5 - f.rating);
+                return '<tr><td>' + f.customerName + '</td><td>#' + f.bookingId + '</td><td class="star-rating">' +
+                        stars + '</td><td>' + (f.comment || '-') + '</td><td>' + formatDate(f.feedbackDate) + '</td></tr>';
+            }).join(''));
+        }
+        $('#feedback-count').text(rows.length);
+    });
+
+    $.get(API_BASE + "/feedback/average-rating", function (response) {
+        const avg = response.body;
+        $('#feedback-average').text(avg ? Number(avg).toFixed(1) + ' / 5' : '-');
+    });
+}
+
+// =============================================================================
+// ANALYTICS - monthly revenue table + chart
+// =============================================================================
+let revenueChartInstance = null;
+
+function loadAnalytics() {
+    $.get(API_BASE + "/analytics/monthly-revenue", function (response) {
+        const rows = response.body;
+        if (rows.length === 0) {
+            $('#analytics-body').html('<tr><td colspan="2" style="color:var(--text-dim)">No revenue data yet.</td></tr>');
+            renderRevenueChart([], []);
+            return;
+        }
+        $('#analytics-body').html(rows.map(r =>
+            '<tr><td>' + r.month + '</td><td>Rs. ' + r.totalRevenue + '</td></tr>'
+        ).join(''));
+        renderRevenueChart(rows.map(r => r.month), rows.map(r => r.totalRevenue));
+    });
+}
+
+// =============================================================================
 // PAGE INIT - load every simple CRUD table, plus the special screens
 // =============================================================================
 Object.keys(CRUD).forEach(function (key) {
@@ -423,3 +480,5 @@ loadStationDropdownsThenTable();
 loadStationGameSection();
 loadSnackDropdownsThenTable();
 loadBookings();
+loadFeedback();
+loadAnalytics();

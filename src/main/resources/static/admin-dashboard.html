@@ -262,6 +262,61 @@
             <table><thead><tr><th>Customer</th><th>Station</th><th>Start</th><th>End</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
                 <tbody id="booking-body"></tbody></table>
         </div>
+
+        <div class="section" data-section="employee">
+            <h2>Employees</h2>
+            <div class="error-msg" id="employee-error"></div>
+            <div class="success-msg" id="employee-success"></div>
+            <div class="card" style="max-width:100%; margin-bottom:20px;">
+                <div class="form-grid">
+                    <div class="field"><label>Name</label><input id="employee-name"></div>
+                    <div class="field"><label>Email</label><input id="employee-email" type="email"></div>
+                    <div class="field"><label>Phone</label><input id="employee-phone"></div>
+                    <div class="field"><label>Password</label><input id="employee-password" type="password" placeholder="Required on every save, incl. edits"></div>
+                </div>
+                <div class="form-actions">
+                    <button onclick="crudSave('employee')">Save</button>
+                    <button class="secondary" onclick="crudResetForm('employee')">Clear</button>
+                </div>
+            </div>
+            <table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Actions</th></tr></thead>
+                <tbody id="employee-body"></tbody></table>
+
+            <button class="secondary" style="margin-top:16px" onclick="toggleInactive('employee')" id="employee-inactive-toggle">Show Deleted Employees</button>
+            <table id="employee-inactive-table" style="display:none; margin-top:10px">
+                <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Actions</th></tr></thead>
+                <tbody id="employee-inactive-body"></tbody>
+            </table>
+        </div>
+
+        <div class="section" data-section="feedback">
+            <h2>Customer Feedback</h2>
+            <p style="color:var(--text-dim); font-size:13px; margin-top:-8px;">
+                Feedback can only be left by a customer once their booking is marked COMPLETED
+                in the Bookings section above.
+            </p>
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-label">Average Rating</div>
+                    <div class="stat-value" id="feedback-average">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Reviews</div>
+                    <div class="stat-value" id="feedback-count">-</div>
+                </div>
+            </div>
+            <table><thead><tr><th>Customer</th><th>Booking</th><th>Rating</th><th>Comment</th><th>Date</th></tr></thead>
+                <tbody id="feedback-body"></tbody></table>
+        </div>
+
+        <div class="section" data-section="analytics">
+            <h2>Monthly Revenue</h2>
+            <div class="chart-wrap">
+                <canvas id="revenueChart"></canvas>
+            </div>
+            <table><thead><tr><th>Month</th><th>Total Revenue</th></tr></thead>
+                <tbody id="analytics-body"></tbody></table>
+        </div>
     </div>
 </div>
 
