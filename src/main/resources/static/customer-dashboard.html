@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard // Gaming Lounge System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand">🎮 Gaming Lounge</div>
+    <div class="user-info">
+        <span id="welcomeText"></span>
+        <button class="secondary" style="width:auto; padding:6px 14px; margin-left:14px" onclick="logout()">Logout</button>
+    </div>
+</div>
+
+<div class="container">
+
+    <h2>Available Stations</h2>
+    <div class="error-msg" id="bookingError"></div>
+    <div class="success-msg" id="bookingSuccess"></div>
+
+    <table id="stationsTable">
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Type</th>
+            <th>Branch</th>
+            <th>Rate / hr</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody id="stationsBody"></tbody>
+    </table>
+
+    <div class="card" id="bookingForm" style="display:none; max-width:420px; margin-top:20px;">
+        <h1 style="font-size:16px;">Book Station <span id="bookingStationCode"></span></h1>
+        <div class="field">
+            <label>Start Time</label>
+            <input type="datetime-local" id="startTime">
+        </div>
+        <div class="field">
+            <label>End Time</label>
+            <input type="datetime-local" id="endTime">
+        </div>
+        <button onclick="submitBooking()">Confirm Booking</button>
+        <button class="secondary" style="margin-top:8px" onclick="cancelBookingForm()">Cancel</button>
+    </div>
+
+    <h2 style="margin-top:40px;">Snack Menu</h2>
+    <div class="error-msg" id="orderError"></div>
+    <div class="success-msg" id="orderSuccess"></div>
+
+    <table id="snacksTable">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>In Stock</th>
+            <th>Qty</th>
+        </tr>
+        </thead>
+        <tbody id="snacksBody"></tbody>
+    </table>
+    <button id="placeOrderBtn" style="width:auto; padding:10px 20px; margin-top:12px" onclick="submitFoodOrder()">Place Order</button>
+
+    <div id="guestHidden1">
+        <h2 style="margin-top:40px;">My Bookings</h2>
+        <table id="bookingsTable">
+            <thead>
+            <tr>
+                <th>Station</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Payment</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody id="bookingsBody"></tbody>
+        </table>
+
+        <div class="card" id="paymentForm" style="display:none; max-width:420px; margin-top:20px;">
+            <h1 style="font-size:16px;">Pay for Booking <span id="paymentStationCode"></span></h1>
+            <p style="color:var(--text-dim); font-size:13px; margin-top:-8px;">
+                Amount due: Rs. <span id="paymentAmountText"></span>
+            </p>
+            <div class="field">
+                <label>Payment Method</label>
+                <select id="paymentMethod">
+                    <option value="CARD">Card</option>
+                    <option value="CASH">Cash</option>
+                    <option value="ONLINE">Online</option>
+                </select>
+            </div>
+            <button onclick="submitPayment()">Confirm Payment</button>
+            <button class="secondary" style="margin-top:8px" onclick="cancelPaymentForm()">Cancel</button>
+        </div>
+
+        <h2 style="margin-top:40px;">Payment &amp; Invoice History</h2>
+        <div class="error-msg" id="paymentError"></div>
+        <div class="success-msg" id="paymentSuccess"></div>
+        <table id="paymentsTable">
+            <thead>
+            <tr>
+                <th>For</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Invoice</th>
+            </tr>
+            </thead>
+            <tbody id="paymentsBody"></tbody>
+        </table>
+
+        <div class="card" id="invoiceCard" style="display:none; max-width:420px; margin-top:16px;">
+            <h1 style="font-size:16px;">Invoice <span id="invoiceNumber"></span></h1>
+            <p style="font-size:13px; color:var(--text-dim); margin:4px 0;">Issued: <span id="invoiceDate"></span></p>
+            <p style="font-size:13px; color:var(--text-dim); margin:4px 0;">Billed to: <span id="invoiceCustomer"></span></p>
+            <p style="font-size:20px; font-weight:700; margin-top:12px;">Rs. <span id="invoiceAmount"></span></p>
+        </div>
+    </div>
+
+
+    <h2 style="margin-top:40px;">Membership Plans</h2>
+    <div class="error-msg" id="membershipError"></div>
+    <div class="success-msg" id="membershipSuccess"></div>
+    <table id="plansTable">
+        <thead>
+        <tr>
+            <th>Plan</th>
+            <th>Price</th>
+            <th>Duration</th>
+            <th>Discount</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody id="plansBody"></tbody>
+    </table>
+
+    <div id="guestHidden2">
+        <h2 style="margin-top:28px;">My Membership</h2>
+        <table id="myMembershipsTable">
+            <thead>
+            <tr>
+                <th>Plan</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody id="myMembershipsBody"></tbody>
+        </table>
+
+        <h2 style="margin-top:40px;">Leave Feedback</h2>
+        <div class="error-msg" id="feedbackError"></div>
+        <div class="success-msg" id="feedbackSuccess"></div>
+        <div class="card" style="max-width:460px;">
+            <div class="field">
+                <label>Booking</label>
+                <select id="feedbackBookingId"></select>
+            </div>
+            <div class="field">
+                <label>Rating</label>
+                <select id="feedbackRating">
+                    <option value="5">5 - Excellent</option>
+                    <option value="4">4 - Good</option>
+                    <option value="3">3 - Okay</option>
+                    <option value="2">2 - Poor</option>
+                    <option value="1">1 - Terrible</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Comment (optional)</label>
+                <textarea id="feedbackComment" rows="3" placeholder="Tell us what you thought..."></textarea>
+            </div>
+            <button onclick="submitFeedback()">Submit Feedback</button>
+        </div>
+
+        <h2 style="margin-top:28px;">My Feedback History</h2>
+        <table id="myFeedbackTable">
+            <thead>
+            <tr>
+                <th>Booking</th>
+                <th>Rating</th>
+                <th>Comment</th>
+                <th>Date</th>
+            </tr>
+            </thead>
+            <tbody id="myFeedbackBody"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script src="lib/jquery-4.0.0.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/pages/customer-dashboard.js"></script>
+</body>
+</html>
