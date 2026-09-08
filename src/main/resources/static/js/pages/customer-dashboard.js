@@ -6,7 +6,63 @@ $('#welcomeText').text("Hi, " + getUserName());
 
 const isGuest = (localStorage.getItem("role") === "GUEST");
 if (isGuest) {
-    $('#guestHidden1, #guestHidden2, #placeOrderBtn').hide();
+    $('#guestHidden1, #guestHidden2, #guestHiddenProfile, #placeOrderBtn').hide();
+}
+
+
+// =============================================================================
+// MY PROFILE - view + update
+// =============================================================================
+function loadMyProfile() {
+    $.get(API_BASE + "/customer/" + getUserId(), function (response) {
+        const c = response.body;
+        $('#profileName').val(c.name);
+        $('#profileEmail').val(c.email);
+        $('#profilePhone').val(c.phone);
+        $('#profileAddress').val(c.address);
+    });
+}
+
+function submitProfileUpdate() {
+    $('#profileError').hide();
+    $('#profileSuccess').hide();
+
+    const name = $('#profileName').val().trim();
+    const email = $('#profileEmail').val().trim();
+    const phone = $('#profilePhone').val().trim();
+    const address = $('#profileAddress').val().trim();
+
+    if (!name || !email || !phone || !address) {
+        $('#profileError').text("Please fill in all fields.").show();
+        return;
+    }
+
+    $.ajax({
+        url: API_BASE + "/customer",
+        type: "PUT",
+        contentType: "application/json",
+        data: JSON.stringify({
+            id: getUserId(),
+            name: name,
+            email: email,
+            phone: phone,
+            password: "unchanged",
+            address: address
+        }),
+        success: function () {
+            $('#profileSuccess').text("Profile updated successfully!").show();
+            if (name !== getUserName()) {
+                localStorage.setItem("name", name);
+                $('#welcomeText').text("Hi, " + getUserName());
+            }
+        },
+        error: function (xhr) {
+            const msg = (xhr.responseJSON && xhr.responseJSON.message)
+                    ? xhr.responseJSON.message
+                    : "Could not update profile. Please try again.";
+            $('#profileError').text(msg).show();
+        }
+    });
 }
 
 
@@ -455,6 +511,7 @@ loadStations();
 loadSnacks();
 loadMembershipPlans();
 if (!isGuest) {
+    loadMyProfile();
     loadMyPayments(loadMyBookings);
     loadMyMemberships();
     loadMyFeedback();
