@@ -26,6 +26,7 @@ public class FoodOrderServiceImpl implements FoodOrderService{
     private final CustomerRepository customerRepository;
     private final SnackRepository snackRepository;
     private final MembershipRepository membershipRepository;
+    private final StockAlertService stockAlertService;
 
     @Override
     @Transactional
@@ -65,7 +66,6 @@ public class FoodOrderServiceImpl implements FoodOrderService{
             totalAmount += snack.getPrice() * itemDTO.getQuantity();
         }
 
-        // Same membership discount used for bookings, applied here too
         Optional<Membership> activeMembership =
                 membershipRepository.findFirstByCustomer_IdAndStatus(
                         dto.getCustomerId(), MembershipStatus.ACTIVE);
@@ -89,9 +89,10 @@ public class FoodOrderServiceImpl implements FoodOrderService{
             item.setSubTotal(snack.getPrice() * itemDTO.getQuantity());
             foodOrderItemRepository.save(item);
 
-            // Reduce stock now that the order is confirmed
             snack.setStockQty(snack.getStockQty() - itemDTO.getQuantity());
             snackRepository.save(snack);
+
+            stockAlertService.checkAndAlert(snack);
         }
         log.info("Saved successfully to database");
     }

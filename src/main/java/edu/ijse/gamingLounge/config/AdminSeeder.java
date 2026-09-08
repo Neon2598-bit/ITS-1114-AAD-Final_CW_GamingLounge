@@ -15,7 +15,7 @@ public class AdminSeeder implements CommandLineRunner {
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
 
-    private static final String ADMIN_EMAIL = "admin@.com";
+    private static final String ADMIN_EMAIL = "erandamadushan.1998@gmail.com";
     private static final String ADMIN_PASSWORD = "Admin@123";
 
     @Override

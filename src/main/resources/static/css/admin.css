@@ -29,6 +29,19 @@
 .section { display: none; }
 .section.active { display: block; }
 
+.chart-wrap {
+    position: relative;
+    height: 320px;
+    width: 100%;
+    max-width: 720px;
+    margin-bottom: 24px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
 .form-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

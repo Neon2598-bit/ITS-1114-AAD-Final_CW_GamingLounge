@@ -52,11 +52,20 @@ public class BookingServiceImpl implements BookingService {
 
         Station station = stationOptional.get();
 
-        // Business rule: you can't book a station that's already occupied or under maintenance
         if (station.getStatus() != StationStatus.AVAILABLE) {
             log.error("Station {} is not available for booking", station.getStationCode());
             throw new BusinessException(
                     "Station " + station.getStationCode() + " is not available for booking.");
+        }
+
+        boolean hasOverlap = bookingRepository.findByCustomer_Id(dto.getCustomerId()).stream()
+                .filter(b -> b.getStatus() == BookingStatus.BOOKED || b.getStatus() == BookingStatus.ONGOING)
+                .anyMatch(b -> dto.getStartTime().isBefore(b.getEndTime()) && b.getStartTime().isBefore(dto.getEndTime()));
+
+        if (hasOverlap) {
+            log.error("Customer {} already has an overlapping booking", dto.getCustomerId());
+            throw new BusinessException(
+                    "You already have another booking during this time. Please finish or cancel it first.");
         }
 
         // Calculate the price: number of hours booked x the station type's hourly rate

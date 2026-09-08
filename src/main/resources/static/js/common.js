@@ -38,3 +38,8 @@ function getUserId() {
 function getUserName() {
     return localStorage.getItem("name");
 }
+
+function formatDate(isoString) {
+    const d = new Date(isoString);
+    return d.toLocaleString();
+}

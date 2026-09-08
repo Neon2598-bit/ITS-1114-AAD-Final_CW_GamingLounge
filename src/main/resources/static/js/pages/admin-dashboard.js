@@ -88,6 +88,18 @@ function showCrudSuccess(key, text) {
     $('#' + key + '-success').text(text).show();
 }
 
+const DROPDOWN_REFRESH = {
+    snackCategory: function () { fillSelect('#snack-snackCategoryId', '/snack-category', 'id', r => r.categoryName); },
+    branch:        function () { fillSelect('#station-branchId', '/branch', 'id', r => r.branchName); },
+    stationType:   function () { fillSelect('#station-stationTypeId', '/station-type', 'id', r => r.typeName + ' (Rs. ' + r.hourlyRate + '/hr)'); },
+    station:       function () { fillSelect('#stationGame-stationId', '/station', 'id', r => r.stationCode); },
+    game:          function () { fillSelect('#stationGame-gameId', '/game', 'id', r => r.gameName); }
+};
+
+function refreshDependentDropdown(key) {
+    if (DROPDOWN_REFRESH[key]) DROPDOWN_REFRESH[key]();
+}
+
 // ---- Generic Save (handles both create and update)
 function crudSave(key) {
     const cfg = CRUD[key];
@@ -109,6 +121,7 @@ function crudSave(key) {
             showCrudSuccess(key, dto.id ? "Updated successfully." : "Added successfully.");
             crudResetForm(key);
             loadCrud(key);
+            refreshDependentDropdown(key);
         },
         error: function (xhr) { showCrudError(key, xhr); }
     });
@@ -141,7 +154,11 @@ function crudDelete(key, id) {
     $.ajax({
         url: API_BASE + CRUD[key].endpoint + "/" + id,
         type: "DELETE",
-        success: function () { showCrudSuccess(key, "Deleted."); loadCrud(key); },
+        success: function () {
+            showCrudSuccess(key, "Deleted.");
+            loadCrud(key);
+            refreshDependentDropdown(key);
+        },
         error: function (xhr) { showCrudError(key, xhr); }
     });
 }
@@ -190,6 +207,7 @@ function crudRestore(key, id) {
             showCrudSuccess(key, "Restored.");
             loadCrud(key);
             loadInactive(key);
+            refreshDependentDropdown(key);
         },
         error: function (xhr) { showCrudError(key, xhr); }
     });
@@ -453,6 +471,60 @@ function loadFeedback() {
 // ANALYTICS - monthly revenue table + chart
 // =============================================================================
 let revenueChartInstance = null;
+
+function renderRevenueChart(labels, data) {
+    const canvas = document.getElementById('revenueChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    if (revenueChartInstance) {
+        revenueChartInstance.destroy();
+    }
+
+    const style = getComputedStyle(document.documentElement);
+    const primary = style.getPropertyValue('--primary').trim() || '#6c5ce7';
+    const textDim = style.getPropertyValue('--text-dim').trim() || '#9497a3';
+    const border = style.getPropertyValue('--border').trim() || '#2a2e3a';
+
+    revenueChartInstance = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Revenue (Rs.)',
+                data: data,
+                backgroundColor: primary,
+                borderRadius: 4,
+                maxBarThickness: 48
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function (ctx) { return 'Rs. ' + ctx.parsed.y; }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: textDim },
+                    grid: { color: border }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: textDim,
+                        callback: function (value) { return 'Rs. ' + value; }
+                    },
+                    grid: { color: border }
+                }
+            }
+        }
+    });
+}
 
 function loadAnalytics() {
     $.get(API_BASE + "/analytics/monthly-revenue", function (response) {

@@ -43,6 +43,12 @@ public class AuthServiceImpl implements AuthService {
             if (customerOptional.isPresent()) {
                 Customer customer = customerOptional.get();
                 if (passwordEncoder.matches(dto.getPassword(), customer.getPassword())) {
+                    if (!customer.isActive()) {
+                        log.error("Login blocked - account deactivated: {}", dto.getEmail());
+                        throw new BusinessException(
+                                "This account has been deactivated. Please contact support.",
+                                HttpStatus.FORBIDDEN);
+                    }
                     if (!customer.isEmailVerified()) {
                         log.error("Login blocked - email not verified: {}", dto.getEmail());
                         throw new BusinessException(

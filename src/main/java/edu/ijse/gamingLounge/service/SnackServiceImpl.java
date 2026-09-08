@@ -22,6 +22,7 @@ import java.util.Optional;
 public class SnackServiceImpl implements SnackService {
     private final SnackRepository snackRepository;
     private final SnackCategoryRepository snackCategoryRepository;
+    private final StockAlertService stockAlertService;
 
     @Override
     public void saveSnack(SnackDTO dto) {
@@ -38,6 +39,7 @@ public class SnackServiceImpl implements SnackService {
                 snack.setSnackCategory(categoryOptional.get());
                 snackRepository.save(snack);
                 log.info("Snack saved successfully to database");
+                stockAlertService.checkAndAlert(snack);
             }
         } catch (Exception e) {
             log.error("Couldn't save snack", e.getMessage());
@@ -62,6 +64,7 @@ public class SnackServiceImpl implements SnackService {
         snack.setSnackCategory(categoryOptional.get());
         snackRepository.save(snack);
         log.info("Snack updated successfully to database");
+        stockAlertService.checkAndAlert(snack);
     }
 
     @Override

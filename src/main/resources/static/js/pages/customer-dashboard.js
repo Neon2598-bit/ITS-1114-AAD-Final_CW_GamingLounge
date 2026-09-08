@@ -11,15 +11,6 @@ if (isGuest) {
 
 
 // =============================================================================
-// SHARED HELPERS
-// =============================================================================
-function formatDate(isoString) {
-    const d = new Date(isoString);
-    return d.toLocaleString();
-}
-
-
-// =============================================================================
 // STATIONS - browse + start a booking
 // =============================================================================
 let selectedStationId = null;
@@ -44,12 +35,54 @@ function loadStations() {
     });
 }
 
+function pad2(n) {
+    return String(n).padStart(2, '0');
+}
+
 function openBookingForm(stationId, stationCode) {
     selectedStationId = stationId;
     $('#bookingStationCode').text(stationCode);
+
+    const now = new Date();
+    const todayStr = now.getFullYear() + '-' + pad2(now.getMonth() + 1) + '-' + pad2(now.getDate());
+    $('#bookingDate').val(todayStr).attr('min', todayStr);
+
+    let hours = now.getHours();
+    let minutes = now.getMinutes() < 30 ? 30 : 0;
+    if (minutes === 0) hours = (hours + 1) % 24;
+    $('#bookingStartTime').val(pad2(hours) + ':' + pad2(minutes));
+
+    $('#bookingDuration').val('1');
+    updateBookingEndPreview();
+
     $('#bookingForm').show();
     $('html, body').animate({ scrollTop: $('#bookingForm').offset().top - 20 }, 300);
 }
+
+function getBookingTimes() {
+    const date = $('#bookingDate').val();
+    const time = $('#bookingStartTime').val();
+    const duration = Number($('#bookingDuration').val());
+    if (!date || !time || !duration) return null;
+
+    const start = new Date(date + 'T' + time);
+    if (isNaN(start.getTime())) return null;
+    const end = new Date(start.getTime() + duration * 60 * 60 * 1000);
+
+    const toIso = function (d) {
+        return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) +
+                'T' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+    };
+
+    return { startTime: toIso(start), endTime: toIso(end) };
+}
+
+function updateBookingEndPreview() {
+    const times = getBookingTimes();
+    $('#bookingEndPreview').text(times ? ('Ends at ' + formatDate(times.endTime)) : '');
+}
+
+$(document).on('input change', '#bookingDate, #bookingStartTime, #bookingDuration', updateBookingEndPreview);
 
 function cancelBookingForm() {
     $('#bookingForm').hide();
@@ -57,13 +90,12 @@ function cancelBookingForm() {
 }
 
 function submitBooking() {
-    const startTime = $('#startTime').val();
-    const endTime = $('#endTime').val();
     $('#bookingError').hide();
     $('#bookingSuccess').hide();
 
-    if (!startTime || !endTime) {
-        $('#bookingError').text("Please choose both a start and end time.").show();
+    const times = getBookingTimes();
+    if (!times) {
+        $('#bookingError').text("Please choose a date, start time and duration.").show();
         return;
     }
 
@@ -72,8 +104,8 @@ function submitBooking() {
         type: "POST",
         contentType: "application/json",
         data: JSON.stringify({
-            startTime: startTime,
-            endTime: endTime,
+            startTime: times.startTime,
+            endTime: times.endTime,
             customerId: getUserId(),
             stationId: selectedStationId
         }),
@@ -268,6 +300,11 @@ function loadMyPayments(callback) {
             }).join(''));
         }
 
+        if (callback) callback();
+    }).fail(function () {
+        // No payments yet (or request failed) - still load bookings, just with nothing marked as paid.
+        paidBookingIds = new Set();
+        $('#paymentsBody').html('<tr><td colspan="6" style="color:#9497a3">No payments yet.</td></tr>');
         if (callback) callback();
     });
 }
