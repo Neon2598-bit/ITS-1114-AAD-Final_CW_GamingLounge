@@ -104,6 +104,22 @@
     </table>
     <button id="placeOrderBtn" style="width:auto; padding:10px 20px; margin-top:12px" onclick="submitFoodOrder()">Place Order</button>
 
+    <div id="guestHidden0">
+        <h2 style="margin-top:40px;">My Orders</h2>
+        <table id="ordersTable">
+            <thead>
+            <tr>
+                <th>Order #</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Order Status</th>
+                <th>Payment</th>
+            </tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+        </table>
+    </div>
+
     <div id="guestHidden1">
         <h2 style="margin-top:40px;">My Bookings</h2>
         <table id="bookingsTable">
@@ -113,7 +129,7 @@
                 <th>Start</th>
                 <th>End</th>
                 <th>Amount</th>
-                <th>Status</th>
+                <th>Session Status</th>
                 <th>Payment</th>
                 <th>Action</th>
             </tr>
@@ -122,7 +138,7 @@
         </table>
 
         <div class="card" id="paymentForm" style="display:none; max-width:420px; margin-top:20px;">
-            <h1 style="font-size:16px;">Pay for Booking <span id="paymentStationCode"></span></h1>
+            <h1 style="font-size:16px;">Pay for <span id="paymentTargetLabel"></span></h1>
             <p style="color:var(--text-dim); font-size:13px; margin-top:-8px;">
                 Amount due: Rs. <span id="paymentAmountText"></span>
             </p>

@@ -202,7 +202,7 @@ function loadMyBookings() {
                 } else if (paidBookingIds.has(b.id)) {
                     paymentCell = '<span style="color:var(--success)">Paid ✓</span>';
                 } else {
-                    paymentCell = '<button style="width:auto; padding:6px 10px" onclick="openPaymentForm(' +
+                    paymentCell = '<button style="width:auto; padding:6px 10px" onclick="openPaymentForm(\'BOOKING\', ' +
                             b.id + ', \'' + b.stationCode + '\', ' + b.totalAmount + ')">Pay Now</button>';
                 }
 
@@ -273,8 +273,9 @@ function submitFoodOrder() {
         contentType: "application/json",
         data: JSON.stringify({ customerId: getUserId(), items: items }),
         success: function () {
-            $('#orderSuccess').text("Order placed successfully!").show();
+            $('#orderSuccess').text("Order placed successfully! Pay for it under 'My Orders' below.").show();
             loadSnacks();
+            loadMyOrders();
         },
         error: function (xhr) {
             const msg = (xhr.responseJSON && xhr.responseJSON.message)
@@ -285,16 +286,51 @@ function submitFoodOrder() {
     });
 }
 
+function loadMyOrders() {
+    $.get(API_BASE + "/food-order/by-customer/" + getUserId(), function (response) {
+        renderOrders(response.body);
+    }).fail(function () {
+        renderOrders([]);
+    });
+}
+
+function renderOrders(orders) {
+    if (!orders || orders.length === 0) {
+        $('#ordersBody').html('<tr><td colspan="5" style="color:#9497a3">No orders yet.</td></tr>');
+        return;
+    }
+    const rows = orders.map(function (o) {
+        const itemsText = o.items.map(function (i) {
+            return i.snackName + ' x' + i.quantity;
+        }).join(', ');
+
+        let paymentCell;
+        if (paidOrderIds.has(o.id)) {
+            paymentCell = '<span style="color:var(--success)">Paid ✓</span>';
+        } else {
+            paymentCell = '<button style="width:auto; padding:6px 10px" onclick="openPaymentForm(\'FOOD_ORDER\', ' +
+                    o.id + ', \'Order #' + o.id + '\', ' + o.totalAmount + ')">Pay Now</button>';
+        }
+
+        return '<tr><td>#' + o.id + '</td><td>' + itemsText + '</td><td>Rs. ' + o.totalAmount +
+                '</td><td>' + o.status + '</td><td>' + paymentCell + '</td></tr>';
+    });
+    $('#ordersBody').html(rows.join(''));
+}
+
 
 // =============================================================================
 // PAYMENTS
 // =============================================================================
-let selectedPaymentBookingId = null;
+let selectedPaymentType = null;
+let selectedPaymentRefId = null;
 let paidBookingIds = new Set();
+let paidOrderIds = new Set();
 
-function openPaymentForm(bookingId, stationCode, amount) {
-    selectedPaymentBookingId = bookingId;
-    $('#paymentStationCode').text(stationCode);
+function openPaymentForm(paymentFor, refId, label, amount) {
+    selectedPaymentType = paymentFor;
+    selectedPaymentRefId = refId;
+    $('#paymentTargetLabel').text(label);
     $('#paymentAmountText').text(amount);
     $('#paymentForm').show();
     $('html, body').animate({ scrollTop: $('#paymentForm').offset().top - 20 }, 300);
@@ -302,7 +338,8 @@ function openPaymentForm(bookingId, stationCode, amount) {
 
 function cancelPaymentForm() {
     $('#paymentForm').hide();
-    selectedPaymentBookingId = null;
+    selectedPaymentType = null;
+    selectedPaymentRefId = null;
 }
 
 function submitPayment() {
@@ -318,14 +355,17 @@ function submitPayment() {
         data: JSON.stringify({
             amount: amount,
             paymentMethod: $('#paymentMethod').val(),
-            paymentFor: "BOOKING",
-            referenceId: selectedPaymentBookingId,
+            paymentFor: selectedPaymentType,
+            referenceId: selectedPaymentRefId,
             customerId: getUserId()
         }),
         success: function () {
             $('#paymentSuccess').text("Payment successful! Invoice generated.").show();
             $('#paymentForm').hide();
-            loadMyPayments(loadMyBookings);
+            loadMyPayments(function () {
+                loadMyBookings();
+                loadMyOrders();
+            });
         },
         error: function (xhr) {
             const msg = (xhr.responseJSON && xhr.responseJSON.message)
@@ -344,6 +384,10 @@ function loadMyPayments(callback) {
             payments.filter(function (p) { return p.paymentFor === "BOOKING"; })
                     .map(function (p) { return p.referenceId; })
         );
+        paidOrderIds = new Set(
+            payments.filter(function (p) { return p.paymentFor === "FOOD_ORDER"; })
+                    .map(function (p) { return p.referenceId; })
+        );
 
         if (payments.length === 0) {
             $('#paymentsBody').html('<tr><td colspan="6" style="color:#9497a3">No payments yet.</td></tr>');
@@ -358,8 +402,8 @@ function loadMyPayments(callback) {
 
         if (callback) callback();
     }).fail(function () {
-        // No payments yet (or request failed) - still load bookings, just with nothing marked as paid.
         paidBookingIds = new Set();
+        paidOrderIds = new Set();
         $('#paymentsBody').html('<tr><td colspan="6" style="color:#9497a3">No payments yet.</td></tr>');
         if (callback) callback();
     });
@@ -512,7 +556,10 @@ loadSnacks();
 loadMembershipPlans();
 if (!isGuest) {
     loadMyProfile();
-    loadMyPayments(loadMyBookings);
+    loadMyPayments(function () {
+        loadMyBookings();
+        loadMyOrders();
+    });
     loadMyMemberships();
     loadMyFeedback();
 }

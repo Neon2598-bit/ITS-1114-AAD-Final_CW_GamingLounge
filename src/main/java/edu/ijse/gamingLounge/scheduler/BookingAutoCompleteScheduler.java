@@ -17,7 +17,7 @@ public class BookingAutoCompleteScheduler {
     private final BookingRepository bookingRepository;
     private final BookingService bookingService;
 
-    @Scheduled(fixedRate = 5 * 60 * 1000) // every 5 minutes
+    @Scheduled(fixedRate = 5 * 1000) // every 5 minutes
     public void autoCompletePastBookings() {
         var overdue = bookingRepository.findByStatusAndEndTimeBefore(BookingStatus.BOOKED, LocalDateTime.now());
         if (overdue.isEmpty()) {
