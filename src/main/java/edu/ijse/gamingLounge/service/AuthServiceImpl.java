@@ -38,6 +38,12 @@ public class AuthServiceImpl implements AuthService {
             if (employeeOptional.isPresent()) {
                 Employee employee = employeeOptional.get();
                 if (passwordEncoder.matches(dto.getPassword(), employee.getPassword())) {
+                    if (!employee.isActive()) {
+                        log.error("Login blocked - employee deactivated: {}", dto.getEmail());
+                        throw new BusinessException(
+                                "This account has been deactivated. Please contact support.",
+                                HttpStatus.FORBIDDEN);
+                    }
                     String token = jwtUtil.generateToken(employee.getEmail(), "ADMIN");
                     log.info("Employee logged in: {}", employee.getEmail());
                     return new LoginResponseDTO(employee.getId(), token, employee.getEmail(), "ADMIN", employee.getName());

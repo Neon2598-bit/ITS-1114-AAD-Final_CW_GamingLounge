@@ -21,4 +21,6 @@ public class Employee {
     private String phone;
 
     private String password;
+
+    private boolean active = true;
 }

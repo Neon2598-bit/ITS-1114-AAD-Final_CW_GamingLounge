@@ -54,21 +54,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void deleteEmployee(Long id) {
-        try {
-            if (employeeRepository.existsById(id)) {
-                employeeRepository.deleteById(id);
-                log.info("Employee deleted successfully from database");
-            }
-        } catch (Exception e) {
-            log.error("Deletion failed", e.getMessage());
+        Optional<Employee> optional = employeeRepository.findById(id);
+        if (optional.isEmpty()) {
+            throw new BusinessException("Employee not found.");
         }
+        Employee employee = optional.get();
+        employee.setActive(false);
+        employeeRepository.save(employee);
+        log.info("Employee marked as inactive.");
     }
 
     @Override
     public List<EmployeeDTO> getAllEmployees() {
         List<EmployeeDTO> list = new ArrayList<>();
         try {
-            for (Employee e : employeeRepository.findAll()) {
+            for (Employee e : employeeRepository.findByActiveTrue()) {
                 list.add(toDTO(e));
             }
             log.info("All employees found successfully from database");
@@ -76,6 +76,35 @@ public class EmployeeServiceImpl implements EmployeeService {
             log.error("Couldn't fetch employees from the database", e.getMessage());
         }
         return list;
+    }
+
+    @Override
+    public List<EmployeeDTO> getInactiveEmployees() {
+        List<EmployeeDTO> list = new ArrayList<>();
+        try {
+            for (Employee e : employeeRepository.findByActiveFalse()) {
+                list.add(toDTO(e));
+            }
+            log.info("Successfully retrieved inactive employees from database");
+        } catch (Exception e) {
+            log.error("Operation failed: {}", e.getMessage());
+        }
+        return list;
+    }
+
+    @Override
+    public void restoreEmployee(Long id) {
+        Optional<Employee> optional = employeeRepository.findById(id);
+        if (optional.isEmpty()) {
+            throw new BusinessException("Employee not found.");
+        }
+        if (optional.get().isActive()) {
+            throw new BusinessException("Employee is already active.");
+        }
+        Employee employee = optional.get();
+        employee.setActive(true);
+        employeeRepository.save(employee);
+        log.info("Employee restored.");
     }
 
     @Override

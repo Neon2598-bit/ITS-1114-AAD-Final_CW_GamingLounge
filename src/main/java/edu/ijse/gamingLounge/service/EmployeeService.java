@@ -10,4 +10,6 @@ public interface EmployeeService {
     void deleteEmployee(Long id);
     List<EmployeeDTO> getAllEmployees();
     EmployeeDTO getEmployeeById(Long id);
+    List<EmployeeDTO> getInactiveEmployees();
+    void restoreEmployee(Long id);
 }

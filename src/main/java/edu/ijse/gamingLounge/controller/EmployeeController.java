@@ -58,4 +58,18 @@ public class EmployeeController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, dto, ResponseMessage.SUCCESS));
     }
+
+    @GetMapping("/inactive")
+    public ResponseEntity<CommonResponse> getInactiveEmployees() {
+        List<EmployeeDTO> list = employeeService.getInactiveEmployees();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, list, ResponseMessage.SUCCESS));
+    }
+
+    @PutMapping("/{id}/restore")
+    public ResponseEntity<CommonResponse> restoreEmployee(@PathVariable Long id) {
+        employeeService.restoreEmployee(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, ResponseMessage.SUCCESS));
+    }
 }
