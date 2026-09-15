@@ -6,4 +6,5 @@ import edu.ijse.gamingLounge.dto.OtpVerifyDTO;
 public interface OtpService {
     void sendOtp(OtpSendDTO dto);
     boolean verifyOtp(OtpVerifyDTO dto);
+    void sendPasswordResetOtp(String email);
 }

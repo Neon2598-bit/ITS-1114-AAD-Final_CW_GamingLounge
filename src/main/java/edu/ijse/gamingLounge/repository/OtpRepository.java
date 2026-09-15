@@ -12,4 +12,7 @@ public interface OtpRepository extends JpaRepository<Otp, Long> {
 
     @Query("SELECT o FROM Otp o WHERE o.customer.id = :customerId ORDER BY o.id DESC LIMIT 1")
     Optional<Otp> findLatestByCustomerId(Long customerId);
+
+    @Query("SELECT o FROM Otp o WHERE o.customer.id = :customerId AND o.purpose = :purpose ORDER BY o.id DESC LIMIT 1")
+    Optional<Otp> findLatestByCustomerIdAndPurpose(Long customerId, String purpose);
 }

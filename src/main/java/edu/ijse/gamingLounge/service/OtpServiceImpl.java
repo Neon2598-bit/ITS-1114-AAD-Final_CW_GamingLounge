@@ -103,6 +103,39 @@ public class OtpServiceImpl implements OtpService {
         }
     }
 
+    @Override
+    public void sendPasswordResetOtp(String email) {
+        try {
+            Optional<Customer> customerOptional = customerRepository.findByEmail(email);
+
+            if (customerOptional.isEmpty()) {
+                log.error("No customer found with email {}", email);
+                return; // silent fail - don't reveal whether an email is registered
+            }
+
+            Customer customer = customerOptional.get();
+            String code = generateSixDigitCode();
+
+            Otp otp = new Otp();
+            otp.setCustomer(customer);
+            otp.setOtpCode(code);
+            otp.setPurpose("PASSWORD_RESET");
+            otp.setExpiryTime(LocalDateTime.now().plusMinutes(EXPIRY_MINUTES));
+            otp.setVerified(false);
+
+            otpRepository.save(otp);
+            log.info("Password reset OTP generated for {}", customer.getEmail());
+
+            String body = "Hello " + customer.getName() + ",\n\n"
+                    + "Your Gaming Lounge Password Reset Code Is : " + code + "\n"
+                    + "This Code Expires In " + EXPIRY_MINUTES + " Minutes.\n\n"
+                    + "If You Didn't Request This, You Can Ignore This E-Mail.";
+            emailService.sendEmail(customer.getEmail(), "Reset Your Gaming Lounge Password", body);
+        } catch (Exception e) {
+            log.error("Error while sending password reset OTP for {}", email, e);
+        }
+    }
+
     private String generateSixDigitCode() {
         SecureRandom secureRandom = new SecureRandom();
         int number = 100000 + secureRandom.nextInt(900000);

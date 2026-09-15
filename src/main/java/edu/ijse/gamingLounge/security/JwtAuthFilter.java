@@ -51,8 +51,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            /*The request will simply be treated as
-            "not logged in" and SecurityConfig decides if that's allowed or not. */
         }
 
         filterChain.doFilter(request, response);

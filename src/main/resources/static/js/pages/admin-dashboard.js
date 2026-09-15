@@ -150,7 +150,7 @@ function crudEdit(key, id) {
 }
 
 function crudDelete(key, id) {
-    if (!confirm("Delete this record? This cannot be undone.")) return;
+    if (!confirm("Delete this record?")) return;
     $.ajax({
         url: API_BASE + CRUD[key].endpoint + "/" + id,
         type: "DELETE",

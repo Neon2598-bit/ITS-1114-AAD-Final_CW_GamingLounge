@@ -1,12 +1,16 @@
 package edu.ijse.gamingLounge.service;
 
+import edu.ijse.gamingLounge.dto.ForgotPasswordDTO;
 import edu.ijse.gamingLounge.dto.LoginDTO;
 import edu.ijse.gamingLounge.dto.LoginResponseDTO;
+import edu.ijse.gamingLounge.dto.ResetPasswordDTO;
 import edu.ijse.gamingLounge.entity.Customer;
 import edu.ijse.gamingLounge.entity.Employee;
+import edu.ijse.gamingLounge.entity.Otp;
 import edu.ijse.gamingLounge.exception.BusinessException;
 import edu.ijse.gamingLounge.repository.CustomerRepository;
 import edu.ijse.gamingLounge.repository.EmployeeRepository;
+import edu.ijse.gamingLounge.repository.OtpRepository;
 import edu.ijse.gamingLounge.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -24,6 +29,8 @@ public class AuthServiceImpl implements AuthService {
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final OtpService otpService;
+    private final OtpRepository otpRepository;
     @Override
     public LoginResponseDTO login(LoginDTO dto) {
         try {
@@ -71,6 +78,44 @@ public class AuthServiceImpl implements AuthService {
             log.error("Operation failed: {}", e.getMessage());
             return null;
         }
+    }
+
+    @Override
+    public void forgotPassword(ForgotPasswordDTO dto) {
+        otpService.sendPasswordResetOtp(dto.getEmail());
+    }
+
+    @Override
+    public void resetPassword(ResetPasswordDTO dto) {
+        Optional<Customer> customerOptional = customerRepository.findByEmail(dto.getEmail());
+        if (customerOptional.isEmpty()) {
+            throw new BusinessException("No account found with this email.", HttpStatus.BAD_REQUEST);
+        }
+        Customer customer = customerOptional.get();
+
+        Optional<Otp> otpOptional = otpRepository.findLatestByCustomerIdAndPurpose(customer.getId(), "PASSWORD_RESET");
+        if (otpOptional.isEmpty()) {
+            throw new BusinessException("No password reset request found. Please request a new code.", HttpStatus.BAD_REQUEST);
+        }
+        Otp otp = otpOptional.get();
+
+        if (otp.getVerified()) {
+            throw new BusinessException("This code has already been used. Please request a new one.", HttpStatus.BAD_REQUEST);
+        }
+        if (otp.getExpiryTime().isBefore(LocalDateTime.now())) {
+            throw new BusinessException("This code has expired. Please request a new one.", HttpStatus.BAD_REQUEST);
+        }
+        if (!otp.getOtpCode().equals(dto.getOtpCode())) {
+            throw new BusinessException("Incorrect code.", HttpStatus.BAD_REQUEST);
+        }
+
+        otp.setVerified(true);
+        otpRepository.save(otp);
+
+        customer.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        customerRepository.save(customer);
+
+        log.info("Password reset successfully for {}", customer.getEmail());
     }
 
     @Override

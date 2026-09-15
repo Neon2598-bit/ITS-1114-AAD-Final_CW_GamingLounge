@@ -3,8 +3,10 @@ package edu.ijse.gamingLounge.controller;
 import edu.ijse.gamingLounge.constant.CommonResponse;
 import edu.ijse.gamingLounge.constant.ResponseCode;
 import edu.ijse.gamingLounge.constant.ResponseMessage;
+import edu.ijse.gamingLounge.dto.ForgotPasswordDTO;
 import edu.ijse.gamingLounge.dto.LoginDTO;
 import edu.ijse.gamingLounge.dto.LoginResponseDTO;
+import edu.ijse.gamingLounge.dto.ResetPasswordDTO;
 import edu.ijse.gamingLounge.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,5 +38,19 @@ public class AuthController {
         LoginResponseDTO response = new LoginResponseDTO(null, token, "guest", "GUEST", "Guest");
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse(ResponseCode.SUCCESS, response, ResponseMessage.SUCCESS));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<CommonResponse> forgotPassword(@Valid @RequestBody ForgotPasswordDTO dto) {
+        authService.forgotPassword(dto);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, "If this email is registered, a reset code has been sent."));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<CommonResponse> resetPassword(@Valid @RequestBody ResetPasswordDTO dto) {
+        authService.resetPassword(dto);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse(ResponseCode.SUCCESS, "Password reset successfully."));
     }
 }
