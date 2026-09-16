@@ -2,11 +2,13 @@ package edu.ijse.gamingLounge.service;
 
 import edu.ijse.gamingLounge.dto.PaymentDTO;
 import edu.ijse.gamingLounge.entity.Customer;
+import edu.ijse.gamingLounge.entity.FoodOrder;
 import edu.ijse.gamingLounge.entity.Invoice;
 import edu.ijse.gamingLounge.entity.Payment;
 import edu.ijse.gamingLounge.exception.BusinessException;
 import edu.ijse.gamingLounge.repository.*;
 import edu.ijse.gamingLounge.status.BookingStatus;
+import edu.ijse.gamingLounge.status.OrderStatus;
 import edu.ijse.gamingLounge.status.PaymentMethod;
 import edu.ijse.gamingLounge.status.PaymentStatus;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +52,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         double expectedAmount;
+        FoodOrder paidFoodOrder = null;
 
         switch (dto.getPaymentFor()) {
             case "BOOKING" -> {
@@ -75,6 +78,7 @@ public class PaymentServiceImpl implements PaymentService {
                     throw new BusinessException("This order does not belong to you.");
                 }
                 expectedAmount = order.getTotalAmount();
+                paidFoodOrder = order;
             }
 
             case "MEMBERSHIP" -> {
@@ -124,6 +128,12 @@ public class PaymentServiceImpl implements PaymentService {
         invoiceRepository.save(invoice);
 
         log.info("Invoice {} generated for payment {}", invoice.getInvoiceNumber(), payment.getId());
+
+        if (paidFoodOrder != null) {
+            paidFoodOrder.setStatus(OrderStatus.COMPLETED);
+            foodOrderRepository.save(paidFoodOrder);
+            log.info("Food order {} marked as COMPLETED after successful payment", paidFoodOrder.getId());
+        }
     }
 
     @Override
