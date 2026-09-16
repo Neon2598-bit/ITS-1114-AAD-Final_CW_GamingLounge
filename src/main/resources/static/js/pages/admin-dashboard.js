@@ -69,6 +69,8 @@ $('#sidebarNav').html(SECTIONS.map(function (s, i) {
     return '<button data-key="' + s.key + '" class="' + (i === 0 ? 'active' : '') + '" onclick="showSection(\'' + s.key + '\')">' + s.label + '</button>';
 }).join(''));
 
+showSection(SECTIONS[0].key);
+
 function showCrudError(key, xhr) {
     let text = "Something went wrong. Please try again.";
     const body = xhr.responseJSON && xhr.responseJSON.body;
@@ -171,7 +173,7 @@ function loadCrud(key) {
 
 function actionBtns(key, row) {
     return '<button class="secondary" onclick="crudEdit(\'' + key + '\', ' + row.id + ')">Edit</button>' +
-           '<button class="danger" onclick="crudDelete(\'' + key + '\', ' + row.id + ')">Delete</button>';
+        '<button class="danger" onclick="crudDelete(\'' + key + '\', ' + row.id + ')">Delete</button>';
 }
 
 function renderTable(key, rows) {
@@ -425,10 +427,10 @@ function loadBookings() {
             const options = BOOKING_STATUSES.map(s =>
                 '<option value="' + s + '"' + (s === b.status ? ' selected' : '') + '>' + s + '</option>').join('');
             return '<tr><td>' + b.customerName + '</td><td>' + b.stationCode + '</td><td>' +
-                    formatDate(b.startTime) + '</td><td>' + formatDate(b.endTime) + '</td><td>Rs. ' +
-                    b.totalAmount + '</td><td>' + b.status + '</td><td>' +
-                    '<select id="booking-status-' + b.id + '" style="width:auto; padding:4px 6px; display:inline-block">' + options + '</select> ' +
-                    '<button style="width:auto; padding:6px 10px" onclick="updateBookingStatus(' + b.id + ')">Update</button></td></tr>';
+                formatDate(b.startTime) + '</td><td>' + formatDate(b.endTime) + '</td><td>Rs. ' +
+                b.totalAmount + '</td><td>' + b.status + '</td><td>' +
+                '<select id="booking-status-' + b.id + '" style="width:auto; padding:4px 6px; display:inline-block">' + options + '</select> ' +
+                '<button style="width:auto; padding:6px 10px" onclick="updateBookingStatus(' + b.id + ')">Update</button></td></tr>';
         }).join(''));
     });
 }
@@ -455,7 +457,7 @@ function loadFeedback() {
             $('#feedback-body').html(rows.map(function (f) {
                 const stars = '★'.repeat(f.rating) + '☆'.repeat(5 - f.rating);
                 return '<tr><td>' + f.customerName + '</td><td>#' + f.bookingId + '</td><td class="star-rating">' +
-                        stars + '</td><td>' + (f.comment || '-') + '</td><td>' + formatDate(f.feedbackDate) + '</td></tr>';
+                    stars + '</td><td>' + (f.comment || '-') + '</td><td>' + formatDate(f.feedbackDate) + '</td></tr>';
             }).join(''));
         }
         $('#feedback-count').text(rows.length);
