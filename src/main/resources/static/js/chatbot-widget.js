@@ -37,12 +37,12 @@ $(function () {
             panel.css('display', 'flex');
             if ($('#chatMessages').children().length === 0) {
                 addBotMessage("Hi! I'm the Gaming Lounge Assistant. Ask me about station rates, " +
-                        "games, snacks, bookings, membership plans, or opening hours.");
+                    "games, snacks, bookings, membership plans, or opening hours.");
             }
         }
     });
 
-    $('#chatSendBtn').on('click', sendChatMessage);
+    $('#chatSendBtn').on('click', function () { sendChatMessage(); });
     $('#chatInput').on('keypress', function (e) {
         if (e.which === 13) sendChatMessage();
     });
@@ -73,17 +73,17 @@ $(function () {
 
     function addUserMessage(text) {
         $('#chatMessages').append(
-                '<div style="text-align:right; margin-bottom:8px;">' +
-                '<span style="background:#6c5ce7; color:white; padding:6px 10px; border-radius:10px; display:inline-block; max-width:80%;">' +
-                escapeHtml(text) + '</span></div>');
+            '<div style="text-align:right; margin-bottom:8px;">' +
+            '<span style="background:#6c5ce7; color:white; padding:6px 10px; border-radius:10px; display:inline-block; max-width:80%;">' +
+            escapeHtml(text) + '</span></div>');
         scrollChatToBottom();
     }
 
     function addBotMessage(text) {
         $('#chatMessages').append(
-                '<div style="text-align:left; margin-bottom:8px;">' +
-                '<span style="background:#2a2e3a; padding:6px 10px; border-radius:10px; display:inline-block; max-width:80%;">' +
-                escapeHtml(text) + '</span></div>');
+            '<div style="text-align:left; margin-bottom:8px;">' +
+            '<span style="background:#2a2e3a; padding:6px 10px; border-radius:10px; display:inline-block; max-width:80%;">' +
+            escapeHtml(text) + '</span></div>');
         scrollChatToBottom();
     }
 

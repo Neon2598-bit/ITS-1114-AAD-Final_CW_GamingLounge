@@ -5,6 +5,7 @@ import edu.ijse.gamingLounge.constant.ResponseCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +27,13 @@ public class GlobalExceptionHandler {
         log.error("Validation failed: {}", errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new CommonResponse(ResponseCode.BAD_REQUEST, errors, "Validation failed"));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<CommonResponse> handleUnreadableBody(HttpMessageNotReadableException ex) {
+        log.error("Malformed request body: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new CommonResponse(ResponseCode.BAD_REQUEST, "Invalid request format."));
     }
 
     @ExceptionHandler(BusinessException.class)
